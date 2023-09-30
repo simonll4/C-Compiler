@@ -10,44 +10,27 @@ LLA : '{' ;
 LLC : '}' ;
 PYC : ';' ;
 COMA : ',' ;
-
+INCREMENTO : '++';
+DECREMENTO : '--';
 MENOR: '<';
 MAYOR: '>';
-IGUALDAD: '==';
+IGUAL: '==';
 DISTINTO: '!=';
 AND: '&&';
 OR: '||';
 
-
-NUMERO : DIGITO+ ;
-
 TDATO : 'int' | 'double' ;
 WHILE : 'while' ;
+FOR : 'for';
 IF : 'if';
+ELSE : 'else';
+RETORNO : 'return';
 
+NUMERO : DIGITO+ ;
 ID : (LETRA | '_')(LETRA | DIGITO | '_')* ;
 
 WS : [ \t\r\n] -> skip ;
 OTRO : . ;
-
-// HORAPAR : ([01][02468] | '2'[02])':'[0-5]DIGITO ;
-
-// FECHAPAR : ('0'[1-9] | [12] DIGITO | '30') '/' ('0'[2468] | '1'[02])
-//                '/' DIGITO DIGITO DIGITO DIGITO ;
-
-// s : ID     {print("ID ->" + $ID.text + "<--") }         s
-//   | NUMERO {print("NUMERO ->" + $NUMERO.text + "<--") } s
-//   | OTRO   {print("Otro ->" + $OTRO.text + "<--") }     s
-//   | HORAPAR {print("Hora par ->" + $HORAPAR.text + "<--") }  s
-//   | FECHAPAR {print("Mes par ->" + $FECHAPAR.text + "<--") }  s
-//   | EOF
-//   ;
-
-// si : s EOF ;
-
-// s : PA s PC s
-//   |
-//   ;
 
 programa : instrucciones EOF ;
 
@@ -55,47 +38,56 @@ instrucciones : instruccion instrucciones
               |
               ;
 
-instruccion : declaracion
-            | asignacion
-            // | retornar
+instruccion : declaracion PYC
+            | asignacion PYC
+            | retornar PYC
             | if_stmt
-            // | for_stmt
+            | for_stmt
             | while_stmt
             | bloque
             ;
 
-declaracion : TDATO ID definicion lista_var PYC ;
+declaracion : TDATO ID definicion lista_var ;
 
 definicion : EQ NUMERO
            |
            ;
 
-asignacion : ID EQ NUMERO PYC;
-
-bloque : LLA instrucciones LLC ;
-
 lista_var : COMA ID definicion lista_var
           |
           ;
 
+asignacion : ID EQ NUMERO;
+
+bloque : LLA instrucciones LLC ;
+
+retornar : RETORNO ID | RETORNO NUMERO;
+
+if_stmt : IF PA opal PC instruccion | IF PA opal PC instruccion else_stmt;
+
+else_stmt : ELSE bloque;
+
+for_stmt : FOR PA (declaracion | asignacion ) PYC opal PYC ID (INCREMENTO | DECREMENTO) PC instruccion;
+
 while_stmt : WHILE PA opal PC instruccion ;
 
-if_stmt : IF PA opal PC instruccion;
 
-opal : ID MAYOR NUMERO
+opal : comp | comp AND opal | comp OR opal;
+
+comp : ID MAYOR NUMERO
     | ID MENOR NUMERO
-	| ID IGUALDAD NUMERO
+	| ID IGUAL NUMERO
 	| ID DISTINTO NUMERO
     | NUMERO MAYOR NUMERO
 	| NUMERO MENOR NUMERO
-	| NUMERO IGUALDAD NUMERO
+	| NUMERO IGUAL NUMERO
 	| NUMERO DISTINTO NUMERO
     | NUMERO MAYOR ID
 	| NUMERO MENOR ID
-	| NUMERO IGUALDAD ID
+	| NUMERO IGUAL ID
 	| NUMERO DISTINTO ID
 	| ID MAYOR ID
 	| ID MENOR ID
-	| ID IGUALDAD ID
+	| ID IGUAL ID
 	| ID DISTINTO ID
 	;

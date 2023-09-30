@@ -1,7 +1,16 @@
 
-if(x < 10) x =1;
 
-while(x == 14){
-    x =10;
+
+for(i = 10 ; i > 0 ; i-- ){
+    x = 10;
 }
+
+return x;
+
+return 10;
+
+
+
+
+
 

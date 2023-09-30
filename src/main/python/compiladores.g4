@@ -11,10 +11,19 @@ LLC : '}' ;
 PYC : ';' ;
 COMA : ',' ;
 
+MENOR: '<';
+MAYOR: '>';
+IGUALDAD: '==';
+DISTINTO: '!=';
+AND: '&&';
+OR: '||';
+
+
 NUMERO : DIGITO+ ;
 
 TDATO : 'int' | 'double' ;
 WHILE : 'while' ;
+IF : 'if';
 
 ID : (LETRA | '_')(LETRA | DIGITO | '_')* ;
 
@@ -47,9 +56,9 @@ instrucciones : instruccion instrucciones
               ;
 
 instruccion : declaracion
-            // | asignacion
+            | asignacion
             // | retornar
-            // | if_stmt
+            | if_stmt
             // | for_stmt
             | while_stmt
             | bloque
@@ -61,6 +70,8 @@ definicion : EQ NUMERO
            |
            ;
 
+asignacion : ID EQ NUMERO PYC;
+
 bloque : LLA instrucciones LLC ;
 
 lista_var : COMA ID definicion lista_var
@@ -69,4 +80,22 @@ lista_var : COMA ID definicion lista_var
 
 while_stmt : WHILE PA opal PC instruccion ;
 
-opal : ID ;
+if_stmt : IF PA opal PC instruccion;
+
+opal : ID MAYOR NUMERO
+    | ID MENOR NUMERO
+	| ID IGUALDAD NUMERO
+	| ID DISTINTO NUMERO
+    | NUMERO MAYOR NUMERO
+	| NUMERO MENOR NUMERO
+	| NUMERO IGUALDAD NUMERO
+	| NUMERO DISTINTO NUMERO
+    | NUMERO MAYOR ID
+	| NUMERO MENOR ID
+	| NUMERO IGUALDAD ID
+	| NUMERO DISTINTO ID
+	| ID MAYOR ID
+	| ID MENOR ID
+	| ID IGUALDAD ID
+	| ID DISTINTO ID
+	;

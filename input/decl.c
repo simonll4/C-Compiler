@@ -1,16 +1,14 @@
 
+int comprar(int x);
 
+int main(){
 
-for(i = 10 ; i > 0 ; i-- ){
-    x = 10;
+    int x = 20;
+    x = comprar(x);
+
+    return 10 + x;
 }
 
-return x;
-
-return 10;
-
-
-
-
-
-
+int comprar(int x){
+    return x + 20;
+}

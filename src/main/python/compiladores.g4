@@ -24,9 +24,7 @@ DIVISION : '/';
 MODULO : '%';
 
 INT : 'int';
-FLOAT: 'float';
 DOUBLE:'double' ;
-CHAR : 'char';
 
 WHILE : 'while' ;
 FOR : 'for';
@@ -59,20 +57,19 @@ instruccion : declaracion PYC
 
 declaracion : tipo_dato ID definicion lista_var ;
 
-definicion : EQ NUMERO
-           |
-           ;
-
 lista_var : COMA ID definicion lista_var
           |
           ;
 
-asignacion : ID EQ opal | ID EQ llamada_funcion;
+definicion : EQ opal
+           |
+           ;
+
+asignacion : ID EQ opal;
 
 tipo_dato : INT 
-          | FLOAT 
-          | DOUBLE 
-          | CHAR;
+          | DOUBLE
+          ;
 
 bloque : LLA instrucciones LLC;
 
@@ -86,29 +83,26 @@ while_stmt : WHILE PA opal PC instruccion ;
 
 retornar : RETORNO opal;
 
-cmp : MAYOR 
-    | MENOR 
-    | IGUAL 
-    | DISTINTO ;
+opal : expresionl;
 
-opal : expresion;
+expresionl : terminol expl;
 
-expresion : termino exp | terminol expl;
+expl : OR terminol expl
+     |;
 
-expl: OR terminol expl
-    |;
+terminol : expresion terml | expresion cmp expresion terml;
 
-terminol: factor terml;
+terml : AND expresionl terml
+      |;
 
-terml : AND factor terml
-    | ;
+expresion : termino exp;
 
 exp : MAS   termino exp
     | MENOS termino exp
     |
     ;
 
-termino : factor term | factor cmp expresion;
+termino : factor term ;
 
 term : MULTIPLICACION factor term
      | DIVISION  factor term    
@@ -116,22 +110,33 @@ term : MULTIPLICACION factor term
      |
      ;
 
-factor : NUMERO
-       | funcion
-       | ID
+factor : ID
+       | NUMERO
+       | llamada_funcion
        | MENOS NUMERO
        | MENOS ID
-       | PA expresion PC
+       | PA expresionl PC
        ;
 
-prototipo_funcion : tipo_dato ID PA args PC;
+prototipo_funcion : tipo_dato ID PA args_recibido PC;
 
-funcion : tipo_dato ID PA args PC bloque ;
+funcion : tipo_dato ID PA args_recibido PC bloque ;
 
-llamada_funcion : ID PA expresion PC;
+llamada_funcion : ID PA args_enviado PC;
 
-args : tipo_dato ID lista_args
-     |;
+args_recibido : tipo_dato ID lista_args_recibido
+              |;
 
-lista_args : COMA tipo_dato  ID lista_args
+lista_args_recibido : COMA tipo_dato  ID lista_args_recibido
             | ;
+
+args_enviado : expresion lista_args_enviado
+             |;
+
+lista_args_enviado: COMA expresion lista_args_enviado
+                  |;
+
+cmp : MAYOR 
+    | MENOR 
+    | IGUAL 
+    | DISTINTO ;

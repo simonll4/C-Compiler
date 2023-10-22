@@ -1,2 +1,15 @@
-probando 123 45probando
-3 palabras
+
+int mostrar(int x);
+
+int main(){
+
+    int x = 10;
+    int y = mostrar(x);
+
+    return 0;
+}
+
+int mostrar(int x){
+
+    return x;
+}

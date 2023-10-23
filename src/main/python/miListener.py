@@ -39,8 +39,8 @@ class miListener(compiladoresListener):
         # else:
         #     print("IDENTIFICADOR YA DECLARADO".center(50, '*'))
         print(ctx.toStringTree())
-        # print(ctx.getText())
-        # print(type(ctx.definicion().opal()))
+        print(ctx.getText())
+        print(type(ctx.definicion().opal()))
         
     def exitLlamada_funcion(self, ctx:compiladoresParser.Llamada_funcionContext):
         pass

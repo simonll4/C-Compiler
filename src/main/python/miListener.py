@@ -1,4 +1,5 @@
 from antlr4 import *
+from antlr4 import tree
 if "." in __name__:
     from .compiladoresParser import compiladoresParser
 else:
@@ -37,7 +38,9 @@ class miListener(compiladoresListener):
         #     self.tablaSimbolos.agregarId(identificador)
         # else:
         #     print("IDENTIFICADOR YA DECLARADO".center(50, '*'))
-        print((str(ctx.toStringTree().translate()))+ "aca")
-
+        print(ctx.toStringTree())
+        # print(ctx.getText())
+        # print(type(ctx.definicion().opal()))
+        
     def exitLlamada_funcion(self, ctx:compiladoresParser.Llamada_funcionContext):
         pass

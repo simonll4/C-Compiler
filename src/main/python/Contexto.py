@@ -9,3 +9,7 @@ class Contexto():
     @property
     def simbolos(self):
         return self._simbolos
+
+    # agregar simbolo
+    def agregarSimbolo(self, identificador):
+        self._simbolos[identificador.nombre] = identificador

@@ -1,4 +1,5 @@
 from ID import *
+from Contexto import Contexto
 
 
 class TS():
@@ -10,41 +11,40 @@ class TS():
     def __new__(cls):
         if TS._instancia is None:
             TS._instancia = object.__new__(cls)
+            TS._pilaContexto.append(Contexto())  # add contexto global
         return TS._instancia
 
-    def agregarContexto(self, **kwards):
-        TS._pilaContexto.append(kwards)
+    def agregarContexto(self, ):
+        TS._pilaContexto.append(Contexto())
 
     def borrarContexto(self):
         TS._pilaContexto.pop()
 
-    def buscarId(self):
-        pass
+    # busca en contexto global y local
+    def buscarIdGlobal(self, identificador):
+        if TS.buscarIdLocal(self, identificador) == True:
+            return True
+        if TS.buscarId(self, identificador) == True:
+            return True
+        return False
 
-    def buscarIdLocal(self, identificador):  # identificador es del tipo ID
-        contexto = TS._pilaContexto[-1]  # tomo ultimo contexto
-
-        # busco por nombre del ID recorriendo las claves del diccionario
-        for i in contexto:
-            if i == identificador.nombre:
+    # busca en los contextos anteriores al local
+    def buscarId(self, identificador):
+        for contexto in TS._pilaContexto[-2::-1]:
+            if identificador.nombre in contexto.simbolos:
                 return True
         return False
 
+    # busca en el contexto local
+    def buscarIdLocal(self, identificador):
+        if identificador.nombre in TS._pilaContexto[-1].simbolos:
+            return True
+        return False
+
     def agregarId(self, identificador):
-        contexto = TS._pilaContexto[-1]  # tomo ultimo contexto
-        # agrego nueva identificador
-        contexto[identificador.nombre] = identificador
+        # tomo ultimo contexto
+        TS._pilaContexto[-1].agregarSimbolo(identificador)
 
 
 if __name__ == "__main__":
-    print('arranca')
-    ts = TS()
-    ts.agregarContexto()
-    print(TS._pilaContexto)
-
-    id1 = Variable("simon", "int")
-    ts.agregarId(id1)
-    id2 = Variable("llamosas", "int")
-    ts.agregarId(id2)
-    print(TS._pilaContexto)
-    print(ts.buscarIdLocal(id2))
+    pass

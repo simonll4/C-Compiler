@@ -1,6 +1,5 @@
+double x = 10;
 
-{
-    
-}
+int a,b = comprar();
 
-int x = 10;
+int x;

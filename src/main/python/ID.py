@@ -34,12 +34,12 @@ class ID(ABC):
         self._tDato = tDato
 
     @inicializado.setter
-    def inicializado(self, inicializado):
-        self._inicializado = inicializado
+    def inicializado(self,flag):
+        self._inicializado = flag
 
     @accedido.setter
-    def accedido(self, accedido):
-        self._accedido = accedido
+    def accedidoTrue(self,flag):
+        self._accedido = flag
 
 
 class Variable(ID):

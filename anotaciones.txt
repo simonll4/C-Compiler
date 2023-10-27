@@ -39,5 +39,40 @@ Hacer las expresiones regulares para capturar:
  - Fechas de meses pares (mes 30 dias y año 4 digitos)
  - Horas entre las 11:45 y las 14:15
  - Numeros hexadecimales (C)
+ - hacer set para inicializado
 
 
+- ctx nodo donde comienza el arbol
+- cuando hago una declaracion de una variable solo me tengo que fijar si existe en el contexto local, si la 
+       declare antes la puedo volver a declarar en el contexto local
+- cuando hago uso de la variable ahi tengo que fijarme si esta declarada en alguno de los contextos, ya se local o global
+- 
+
+
+NOTAS NUEVAS:
+- al codigo intermedio lo vamos hacer post analisis
+- aca vamos a usar el visitor
+- despues de terminar esto vamos a verificar si nop hay ningun tipo de error (lexito,sintactico, semantico) entonces
+       eso se podria convertir en un programa
+- si no hubo ningun error empiezo a recorrer el arbol gramatical y genero el codigo intermedio
+- CODIGO INTEMEDIO: 
+       * es una representacion del sw independiente del lenjuage original(fuente) e independiente del hw.
+       * es un espacio adimensional 
+       * son instrucciones que deberian funcionar en una maquina que interpreta ese codigo intermedio
+       * este codigo va a expones cosas que se pueden optimizar o no (ejemplo, si declaro una variable y no la uso aca se borra)
+       * codigo de tres direcciones( es la familia mas usada): se basa en las operaciones que realiza el cpu
+              a = cte
+              a = b op c (3 direcciones de memoria) es hasta 3 direcciones, no es necesario tenerlas a las 3
+              a = b
+              a = b op cte  (en el op(operador) metemos toda la magia, comparadores,suma,resta,multiplicacion...)
+              label l1
+              jmp l1 (salto)
+              ifjmp a op b, l1 (saltos condicionales)
+              push a (antes de llamar a la funcion)
+              pop a (despues de terminar la funcion)
+
+- visitor:
+       * recibe el arbol
+       * todas la reglas tienen un visit
+       * cada ctx es la raiz del subarbol
+       * 

@@ -9,6 +9,13 @@ class ID(ABC):
         self._inicializado = inicializado
         self._accedido = accedido
 
+    def __str__(self) -> str:
+        return f'[ID: \n nombre={self._nombre} \n tDato={self._tDato} \n inicializado={self._inicializado} \n acedido={self._accedido}]'
+
+    def __eq__(self, other) -> bool:
+        if isinstance(other,ID):
+            return other.nombre == self.nombre and other.tDato == self.tDato
+    
     @property
     def nombre(self):
         return self._nombre
@@ -34,11 +41,11 @@ class ID(ABC):
         self._tDato = tDato
 
     @inicializado.setter
-    def inicializado(self,flag):
+    def inicializado(self, flag):
         self._inicializado = flag
 
     @accedido.setter
-    def accedidoTrue(self,flag):
+    def accedidoTrue(self, flag):
         self._accedido = flag
 
 
@@ -51,3 +58,10 @@ class Funcion(ID):
     def __init__(self, nombre, tDato, args, inicializado=False, accedido=False):
         super().__init__(nombre, tDato, inicializado, accedido)
         self._args = list(args)
+
+    def __eq__(self, other) -> bool:
+        return super().__eq__(other) and other.args == self.args
+    
+    @property
+    def args(self):
+        return self._args

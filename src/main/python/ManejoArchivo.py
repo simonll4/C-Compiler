@@ -8,12 +8,10 @@ class ManejoArchivo:
         self.nombre = nombre
 
     def __enter__(self):
-        print("ABRO ARCHIVO".center(50, '-'))
         self.nombre = open(self.nombre, 'a')
         return self.nombre
 
     def __exit__(self, tipo_exceptcion, valor_excepcion, traza_error):
-        print("CIERRO ARCHIVO".center(50, '-'))
         if self.nombre:
             self.nombre.close()
 

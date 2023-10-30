@@ -76,7 +76,7 @@ class Util:
 
     # devuelve el obejto ID dentro del diccionario(tabla simbolos) que pertenece al contexto
     @staticmethod
-    def obtenerId(contexto, parametro):
+    def obtenerId(contexto, parametro) -> ID:
         for clave, valor in contexto.simbolos.items():
             if clave == parametro:
                 return valor

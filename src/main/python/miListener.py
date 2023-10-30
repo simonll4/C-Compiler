@@ -1,5 +1,4 @@
 from antlr4 import *
-from antlr4 import tree
 if "." in __name__:
     from .compiladoresParser import compiladoresParser
 else:
@@ -52,13 +51,12 @@ class miListener(compiladoresListener):
             identificador = Variable(i, tDato)
             if Util.verificarInicializado(datos) == True:
                 identificador.inicializado = True
-            # buscar localmente si existe el ID
-            if self.tablaSimbolos.buscarIdLocal(identificador.nombre) == False:
+            # buscar localmente si existe el ID para declararlo en su contexto
+            if self.tablaSimbolos.buscarIdLocal(identificador.nombre):
+                print('NO SE AGREGO NUEVO IDENTIFICADOR'.center(50, '-'))
+            else:
                 self.tablaSimbolos.agregarId(identificador)
                 print('SE AGREGO NUEVO IDENTIFICADOR'.center(50, '-'))
-            else:
-                print('NO SE AGREGO NUEVO IDENTIFICADOR'.center(50, '-'))
-        print(self.tablaSimbolos._pilaContexto[0])
 
     # Exit a parse tree produced by compiladoresParser#asignacion.
     def exitAsignacion(self, ctx: compiladoresParser.AsignacionContext):
@@ -66,16 +64,18 @@ class miListener(compiladoresListener):
         datos = ctx.getText()
         listaId = Util.obtenerCantId(datos)
 
-        # buscar globalmente si esta declarada el ID
+        # buscar globalmente si esta declarada el ID para asignarle nuevo valor
         for nombreId in listaId:
             contexto = self.tablaSimbolos.buscarIdGlobal(nombreId)
-            if contexto != False:
-                print("EL INDENTIFICADOR SE ENCUENTRA DECLARADO".center(50, '-'))
+            if contexto:
+                print("EL INDENTIFICADOR SE ENCUENTRA DECLARADO, SE REALIZO LA ASIGNACION".center(
+                    50, '-'))
                 for clave in contexto.simbolos:
                     if clave == nombreId:
                         contexto.simbolos[clave].inicializado = True
             else:
-                print("EL INDENTIFICADOR NO SE ENCUENTRA DECLARADO".center(50, '-'))
+                print("EL INDENTIFICADOR NO SE ENCUENTRA DECLARADO, NO SE REALIZO LA ASIGNACION".center(
+                    50, '-'))
 
     # Exit a parse tree produced by compiladoresParser#prototipo_funcion.
     def exitPrototipo_funcion(self, ctx: compiladoresParser.Prototipo_funcionContext):
@@ -85,11 +85,12 @@ class miListener(compiladoresListener):
         nombre = Util.obtenerNombreFuncion(datos)
         listaArs = Util.obtenerArgumentoFuncion(datos)
         identificador = Funcion(nombre, tDato, listaArs)
-        if self.tablaSimbolos.buscarIdLocal(identificador.nombre) == False:
+
+        if self.tablaSimbolos.buscarIdLocal(identificador.nombre):
+            print('NO SE AGREGO NUEVO IDENTIFICADOR'.center(50, '-'))
+        else:
             self.tablaSimbolos.agregarId(identificador)
             print('SE AGREGO NUEVO IDENTIFICADOR'.center(50, '-'))
-        else:
-            print('NO SE AGREGO NUEVO IDENTIFICADOR'.center(50, '-'))
 
     # Exit a parse tree produced by compiladoresParser#funcion.
     def exitFuncion(self, ctx: compiladoresParser.FuncionContext):
@@ -101,9 +102,9 @@ class miListener(compiladoresListener):
         identificador = Funcion(nombre, tDato, listaArgs)
 
         # buscar identifiacor en la tabla de simbolos
-        if self.tablaSimbolos.buscarIdGlobal(identificador.nombre) == True:
+        if self.tablaSimbolos.buscarIdGlobal(identificador.nombre):
             # corroborar que la funcion corresponda con el prototipo
-            if Util.verificarFuncionPrototipo(identificador) == True:
+            if Util.verificarFuncionPrototipo(identificador):
                 print("LA IMPLEMENTACION CORRESPONDE CON EL PROTOTIPO".center(50, '-'))
             else:
                 print(
@@ -121,18 +122,18 @@ class miListener(compiladoresListener):
         parametros = Util.obtenerParametrosFuncion(datos)
         # busco si esta declarada la funcion
         contextoF = self.tablaSimbolos.buscarIdGlobal(nombreId)
-        # puntero al objeto ID de la funcion
-        identificadorF = Util.obtenerId(contextoF, nombreId)
 
         # buscar el identificador de la funcion
-        if contextoF != False:
+        if contextoF:
+            # puntero al objeto ID de la funcion
+            identificadorF = Util.obtenerId(contextoF, nombreId)
             print("SE ECUENTRA EL PROTOTIPO DE LA FUNCION".center(50, '-'))
             # comprobacion de la cantidad de identifcadores en argumento y parametro
             if Util.verificarCantParametros(identificadorF, parametros):
                 contador = 0
                 for id in parametros:
                     contextoP = self.tablaSimbolos.buscarIdGlobal(id)
-                    if contextoP != False:
+                    if contextoP:
                         print("SE ECUENTRA El ID DEL PARAMETRO".center(50, '-'))
                         identificadorParametro = Util.obtenerId(contextoP, id)
                         if identificadorParametro.tDato != identificadorF.args[contador].tDato:

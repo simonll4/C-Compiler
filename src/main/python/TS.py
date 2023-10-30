@@ -27,28 +27,25 @@ class TS():
     def obtenerUltimoContexto(self):
         return TS._pilaContexto[-1]
 
-    # busca en contexto global y local
-    def buscarIdGlobal(self, nombreId):
+    # busca en contexto global y local, si encuentra ID devuelve en el contexto en que se encontro
+    def buscarIdGlobal(self, nombreId) -> Contexto:
         a = TS.buscarIdLocal(self, nombreId)
         b = TS.buscarId(self, nombreId)
-        if a != False:
+        if a :
             return a
-        if b != False:
+        if b :
             return b
-        return False
 
-    # busca en los contextos anteriores al local
-    def buscarId(self, nombreId):
+    # busca en los contextos anteriores al local, si encuentra ID devuelve contexto en que se encontro
+    def buscarId(self, nombreId) -> Contexto:
         for contexto in TS._pilaContexto[-2::-1]:
             if nombreId in contexto.simbolos:
                 return contexto
-        return False
 
-    # busca en el contexto local
-    def buscarIdLocal(self, nombreId):
+    # busca en el contexto local, si lo encuentra devuelve contexto
+    def buscarIdLocal(self, nombreId) -> Contexto:
         if nombreId in TS._pilaContexto[-1].simbolos:
             return TS._pilaContexto[-1]
-        return False
 
     def agregarId(self, identificador):
         # tomo ultimo contexto

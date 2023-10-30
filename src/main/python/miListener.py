@@ -11,30 +11,34 @@ from TS import TS
 from Contexto import Contexto
 from ID import *
 from Util import *
+from ManejoArchivo import *
 
 
 class miListener(compiladoresListener):
     tablaSimbolos = TS()
+    # borro todo lo que tenga el archivo en un principio
+    with ManejoArchivo("output/tablaSimbolos.txt") as archivoTS:
+        archivoTS.truncate(0)
 
     def enterPrograma(self, ctx: compiladoresParser.ProgramaContext):
         print("enterPrograma".center(80, "*"))
-        # print(self.tablaSimbolos)
 
     def exitPrograma(self, ctx: compiladoresParser.ProgramaContext):
         print("exitPrograma".center(80, "*"))
-        print(self.tablaSimbolos)
+        with ManejoArchivo("output/tablaSimbolos.txt") as archivoTS:
+            archivoTS.write(str(self.tablaSimbolos.obtenerUltimoContexto()))
 
     # Enter a parse tree produced by compiladoresParser#bloque.
     def enterBloque(self, ctx: compiladoresParser.BloqueContext):
         print("enterBloque".center(80, "*"))
-        # print(f"PILA DE CONTEXTOS = \n: {self.tablaSimbolos}")
         self.tablaSimbolos.agregarContexto()
 
     # Exit a parse tree produced by compiladoresParser#bloque.
     def exitBloque(self, ctx: compiladoresParser.BloqueContext):
         print("exitBloque".center(80, "*"))
-        # print(f"CONTEXTO BORRADO:\n {self.tablaSimbolos.borrarContexto()}")
-        # print(f"PILA DE CONTEXTOS = \n{self.tablaSimbolos}")
+        with ManejoArchivo("output/tablaSimbolos.txt") as archivoTS:
+            archivoTS.write(str(self.tablaSimbolos.obtenerUltimoContexto()))
+        self.tablaSimbolos.borrarContexto()
 
     def exitDeclaracion(self, ctx: compiladoresParser.DeclaracionContext):
         print("exitDeclaracion".center(80, "*"))

@@ -13,12 +13,6 @@ class TS():
             TS._instancia = object.__new__(cls)
             TS._pilaContexto.append(Contexto())  # add contexto global
         return TS._instancia
-    
-    def __str__(self):
-        cadena = ''
-        for i in self._pilaContexto:
-            cadena += str(i) + '\n'
-        return cadena
 
     @property
     def pilaContexto(self):
@@ -29,6 +23,9 @@ class TS():
 
     def borrarContexto(self):
         return TS._pilaContexto.pop()
+
+    def obtenerUltimoContexto(self):
+        return TS._pilaContexto[-1]
 
     # busca en contexto global y local
     def buscarIdGlobal(self, nombreId):

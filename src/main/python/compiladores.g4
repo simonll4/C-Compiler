@@ -22,6 +22,8 @@ MENOS : '-';
 MULTIPLICACION : '*';
 DIVISION : '/';
 MODULO : '%';
+INCREMENTO : '++';
+DECREMENTO : '--';
 
 INT : 'int';
 DOUBLE:'double' ;
@@ -77,7 +79,7 @@ if_stmt : IF PA opal PC instruccion | IF PA opal PC instruccion else_stmt;
 
 else_stmt : ELSE bloque;
 
-for_stmt : FOR PA asignacion PYC opal PYC ID asignacion PC instruccion;
+for_stmt : FOR PA asignacion PYC opal PYC asignacion PC instruccion;
 
 while_stmt : WHILE PA opal PC instruccion ;
 

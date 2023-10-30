@@ -10,12 +10,12 @@ class ID(ABC):
         self._accedido = accedido
 
     def __str__(self) -> str:
-        return f'[ID: \n nombre={self._nombre} \n tDato={self._tDato} \n inicializado={self._inicializado} \n acedido={self._accedido}]'
+        return f'[ID: {type(self)} nombre={self._nombre} tDato={self._tDato} inicializado={self._inicializado} accedido={self._accedido}]'
 
     def __eq__(self, other) -> bool:
-        if isinstance(other,ID):
+        if isinstance(other, ID):
             return other.nombre == self.nombre and other.tDato == self.tDato
-    
+
     @property
     def nombre(self):
         return self._nombre
@@ -59,9 +59,15 @@ class Funcion(ID):
         super().__init__(nombre, tDato, inicializado, accedido)
         self._args = list(args)
 
+    def __str__(self) -> str:
+        output = ""
+        for i in self._args:
+            output += str(i) 
+        return f'{super().__str__()}\n args:{ {output}}'
+
     def __eq__(self, other) -> bool:
         return super().__eq__(other) and other.args == self.args
-    
+
     @property
     def args(self):
         return self._args

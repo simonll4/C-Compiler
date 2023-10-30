@@ -1,0 +1,11 @@
+
+CONTEXTO[2]
+[ID: <class 'ID.Variable'> nombre=contador tDato=int inicializado=True accedido=False]
+CONTEXTO[1]
+[ID: <class 'ID.Variable'> nombre=x tDato=int inicializado=True accedido=False]
+[ID: <class 'ID.Variable'> nombre=y tDato=int inicializado=True accedido=False]
+CONTEXTO[0]
+[ID: <class 'ID.Funcion'> nombre=funcion tDato=int inicializado=False accedido=False]
+ args:{"[ID: <class 'ID.Variable'> nombre=x tDato=int inicializado=False accedido=False][ID: <class 'ID.Variable'> nombre=y tDato=int inicializado=False accedido=False]"}
+[ID: <class 'ID.Funcion'> nombre=main tDato=int inicializado=False accedido=False]
+ args:{''}

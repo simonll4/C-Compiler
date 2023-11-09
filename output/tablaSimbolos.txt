@@ -1,3 +1,2 @@
 
 CONTEXTO[0]
-[ID: <class 'ID.Variable'> nombre=a tDato=int inicializado=True accedido=False]

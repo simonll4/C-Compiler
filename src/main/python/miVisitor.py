@@ -38,7 +38,6 @@ class miVisitor(compiladoresVisitor):
                             ' = ' + self.tmp.tActual)
 
     # Visit a parse tree produced by compiladoresParser#opal.
-
     def visitOpal(self, ctx: compiladoresParser.OpalContext):
         return self.visitExpresionl(ctx.getChild(0))
 
@@ -63,29 +62,33 @@ class miVisitor(compiladoresVisitor):
     def visitExpresion(self, ctx: compiladoresParser.ExpresionContext):
         print("visitExpresion".center(50, '*'))
 
-        # grabar en archivo tnuevo = primerValor
+        aux = self.visitTermino(ctx.getChild(0))
+        aux2 = self.visitExp(ctx.getChild(1))
         with ManejoArchivo("output/codigo_intermedio.txt") as archivoCI:
-            archivoCI.write('\n' + self.tmp.t + ' = ' +
-                            str(ctx.getChild(0).getText()))
-        return self.visitExp(ctx.getChild(1))
+            archivoCI.write('\n' + self.tmp.t + ' = ' + aux + ' ' +
+                            ctx.getChild(1).getChild(0).getText() + ' ' + aux2)
+
+        return self.tmp.tActual
 
     # Visit a parse tree produced by compiladoresParser#exp.
     def visitExp(self, ctx: compiladoresParser.ExpContext):
         print("visitExp".center(50, '*'))
 
-        # grabar en archivo tnuevo = tanterior + valor
-        with ManejoArchivo("output/codigo_intermedio.txt") as archivoCI:
-            archivoCI.write('\n'+self.tmp.t + ' = ' + self.tmp.tAnterior +
-                            ctx.getChild(0).getText() + ctx.getChild(1).getText())
-
+        aux1 = self.visitTermino(ctx.getChild(1))
         # si el hijo 3 no contiene nada, finaliza la recursividad
         if ctx.getChild(2).getText() == '':
-            return 1
-        return self.visitExp(ctx.getChild(2))
+            return self.tmp.tActual
+
+        aux = self.visitExp(ctx.getChild(2))
+        with ManejoArchivo("output/codigo_intermedio.txt") as archivoCI:
+            archivoCI.write('\n' + self.tmp.t + ' = ' + aux1 +
+                            ' ' + ctx.getChild(0).getText() + ' ' + aux)
+        return self.tmp.tActual
 
         # return self.visitChildren(ctx)
 
     # Visit a parse tree produced by compiladoresParser#opal.
+
     def visitOpal(self, ctx: compiladoresParser.OpalContext):
         return self.visitChildren(ctx)
 
@@ -95,11 +98,22 @@ class miVisitor(compiladoresVisitor):
 
     # Visit a parse tree produced by compiladoresParser#termino.
     def visitTermino(self, ctx: compiladoresParser.TerminoContext):
-        return self.visitChildren(ctx)
+        print("visitTermino".center(50, '*'))
+        with ManejoArchivo("output/codigo_intermedio.txt") as archivoCI:
+            archivoCI.write('\n' + self.tmp.t + ' = ' +
+                            str(ctx.getChild(0).getText()))
+        return self.visitTerm(ctx.getChild(1))
 
     # Visit a parse tree produced by compiladoresParser#term.
     def visitTerm(self, ctx: compiladoresParser.TermContext):
-        return self.visitChildren(ctx)
+
+        with ManejoArchivo("output/codigo_intermedio.txt") as archivoCI:
+            archivoCI.write('\n'+self.tmp.t + ' = ' + self.tmp.tAnterior +
+                            ' ' + ctx.getChild(0).getText() + ' ' + ctx.getChild(1).getText())
+        # si el hijo 3 no contiene nada, finaliza la recursividad
+        if ctx.getChild(2).getText() == '':
+            return self.tmp.tActual
+        return self.visitTerm(ctx.getChild(2))
 
     # def visitLista_var(self, ctx:compiladoresParser.Lista_varContext):
     #     print("visitLista_var".center(50,'*'))

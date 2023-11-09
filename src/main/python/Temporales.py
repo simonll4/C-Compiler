@@ -4,9 +4,6 @@ class Temporales:
     _listaTmp = []
     _tmp = 0
 
-    # def __str__(self) -> str:
-    #     return f't {Temporales._temp}'
-
     @property
     def t(self):
         Temporales._tmp += 1

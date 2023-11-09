@@ -1,7 +1,4 @@
 
-int suma(int x , int y);
+int a = 1 + 2 + 4 ;
 
-int suma(int x ,int y){
-    int w = 20;
-    return x + y;
-}
+

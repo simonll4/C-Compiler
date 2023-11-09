@@ -1,6 +1,3 @@
 
-CONTEXTO[1]
-[ID: <class 'ID.Variable'> nombre=w tDato=int inicializado=True accedido=False]
 CONTEXTO[0]
-[ID: <class 'ID.Funcion'> nombre=suma tDato=int inicializado=False accedido=False]
- args:{"[ID: <class 'ID.Variable'> nombre=x tDato=int inicializado=False accedido=False][ID: <class 'ID.Variable'> nombre=y tDato=int inicializado=False accedido=False]"}
+[ID: <class 'ID.Variable'> nombre=a tDato=int inicializado=True accedido=False]

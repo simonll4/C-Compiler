@@ -82,7 +82,7 @@ class miVisitor(compiladoresVisitor):
         aux = self.visitExp(ctx.getChild(2))
         with ManejoArchivo("output/codigo_intermedio.txt") as archivoCI:
             archivoCI.write('\n' + self.tmp.t + ' = ' + aux1 +
-                            ' ' + ctx.getChild(0).getText() + ' ' + aux)
+                            ' ' + ctx.getChild(2).getChild(0).getText() + ' ' + aux)
         return self.tmp.tActual
 
         # return self.visitChildren(ctx)

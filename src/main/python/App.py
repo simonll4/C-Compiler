@@ -18,6 +18,7 @@ def main(argv):
     tree = parser.programa()
     # print(tree.toStringTree(recog=parser))
     visitante = miVisitor()
+
     visitante.visit(tree)
 
 if __name__ == '__main__':

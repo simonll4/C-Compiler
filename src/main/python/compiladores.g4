@@ -15,6 +15,8 @@ MENOR: '<';
 MAYOR: '>';
 IGUAL: '==';
 DISTINTO: '!=';
+MENORIGUAL: '<=';
+MAYORIGUAL: '>=';
 AND: '&&';
 OR: '||';
 MAS : '+';
@@ -22,8 +24,6 @@ MENOS : '-';
 MULTIPLICACION : '*';
 DIVISION : '/';
 MODULO : '%';
-INCREMENTO : '++';
-DECREMENTO : '--';
 
 INT : 'int';
 DOUBLE:'double' ;
@@ -93,7 +93,6 @@ expl : OR terminol expl
      |;
 
 terminol : expresion terml | expresion cmp expresion terml;
-
 terml : AND expresionl terml
       |;
 
@@ -140,5 +139,7 @@ lista_args_enviado: COMA expresion lista_args_enviado
 
 cmp : MAYOR 
     | MENOR 
-    | IGUAL 
+    | IGUAL
+    | MENORIGUAL
+    | MAYORIGUAL 
     | DISTINTO ;

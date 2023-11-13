@@ -93,6 +93,7 @@ expl : OR terminol expl
      |;
 
 terminol : expresion terml | expresion cmp expresion terml;
+
 terml : AND expresionl terml
       |;
 

@@ -77,7 +77,8 @@ bloque : LLA instrucciones LLC;
 
 if_stmt : IF PA opal PC instruccion | IF PA opal PC instruccion else_stmt;
 
-else_stmt : ELSE bloque;
+else_stmt : ELSE bloque
+          ;
 
 for_stmt : FOR PA asignacion PYC opal PYC asignacion PC instruccion;
 

@@ -1,16 +1,19 @@
 from compiladoresParser import compiladoresParser
 from compiladoresVisitor import compiladoresVisitor
 from util.ManejoArchivo import *
-from util.Temporales import *
+from util.Etiquetas import *
 
 
 class miVisitor(compiladoresVisitor):
-    tmp = Temporales()
+    tmp = Etiquetas()
     with ManejoArchivo("output/codigo_intermedio.txt") as archivoCI:
         archivoCI.truncate(0)
 
     def visitPrograma(self, ctx: compiladoresParser.ProgramaContext):
         print("visitPrograma".center(50, '*'))
+        return self.visitChildren(ctx)
+
+    def visitInstruccion(self, ctx: compiladoresParser.InstruccionContext):
         return self.visitChildren(ctx)
 
     def visitDeclaracion(self, ctx: compiladoresParser.DeclaracionContext):
@@ -53,10 +56,27 @@ class miVisitor(compiladoresVisitor):
             self.visitLista_var(ctx.getChild(3))
 
     def visitIf_stmt(self, ctx: compiladoresParser.If_stmtContext):
-        return self.visitChildren(ctx)
+        aux = self.visitOpal(ctx.getChild(2))
+        with ManejoArchivo("output/codigo_intermedio.txt") as archivoCI:
+            archivoCI.write(
+                f'\n{ctx.getChild(0).getText()} {aux} jmp {self.tmp.l}')
+            archivoCI.write(f'\njmp {self.tmp.l}')
+            archivoCI.write(f'\nlabel {self.tmp.lAnterior}')
+        self.visitInstruccion(ctx.getChild(4))
+
+        # en caso de que haya else
+        if ctx.getChildCount() == 6:
+            with ManejoArchivo("output/codigo_intermedio.txt") as archivoCI:
+                archivoCI.write(f'\njump {self.tmp.l}')
+            self.visitElse_stmt(ctx.getChild(5))
+
+        with ManejoArchivo("output/codigo_intermedio.txt") as archivoCI:
+            archivoCI.write(f'\nlabel {self.tmp.lActual}')
 
     def visitElse_stmt(self, ctx: compiladoresParser.Else_stmtContext):
-        return self.visitChildren(ctx)
+        with ManejoArchivo("output/codigo_intermedio.txt") as archivoCI:
+            archivoCI.write(f'\nlabel {self.tmp.lAnterior}:')
+        return self.visitBloque(ctx.getChild(1))
 
     def visitFor_stmt(self, ctx: compiladoresParser.For_stmtContext):
         return self.visitChildren(ctx)

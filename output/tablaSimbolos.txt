@@ -1,3 +1,4 @@
 
 CONTEXTO[0]
-[ID: <class 'ID.Variable'> nombre=a tDato=int inicializado=True accedido=False]
+[ID: <class 'ID.Variable'> nombre=b tDato=int inicializado=True accedido=False]
+[ID: <class 'ID.Variable'> nombre=x tDato=int inicializado=True accedido=False]

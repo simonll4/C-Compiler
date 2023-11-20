@@ -15,26 +15,83 @@ class miVisitor(compiladoresVisitor):
 
     def visitDeclaracion(self, ctx: compiladoresParser.DeclaracionContext):
         print("visitDeclaracion".center(50, '*'))
-        self.visitDefinicion(ctx.getChild(2))
-        with ManejoArchivo("output/codigo_intermedio.txt") as archivoCI:
-            archivoCI.write('\n' + ctx.getChild(1).getText() +
-                            ' = ' + self.tmp.tActual)
+
+        if ctx.getChild(2).getText() != '':
+            self.visitDefinicion(ctx.getChild(2))
+            with ManejoArchivo("output/codigo_intermedio.txt") as archivoCI:
+                archivoCI.write(
+                    '\n' + ctx.getChild(1).getText() + ' = ' + self.tmp.tActual)
+
+        if ctx.getChild(3).getText() != '':
+            self.visitLista_var(ctx.getChild(3))
 
     def visitDefinicion(self, ctx: compiladoresParser.DefinicionContext):
         print("visitDefinicion".center(50, '*'))
+
         return self.visitOpal(ctx.getChild(1))
 
     def visitAsignacion(self, ctx: compiladoresParser.AsignacionContext):
         print("visitAsignacion".center(50, '*'))
+
         self.visitOpal(ctx.getChild(2))
         with ManejoArchivo("output/codigo_intermedio.txt") as archivoCI:
             archivoCI.write('\n' + ctx.getChild(0).getText() +
                             ' = ' + self.tmp.tActual)
 
+    def visitLista_var(self, ctx: compiladoresParser.Lista_varContext):
+        print("visitLista_var".center(50, '*'))
+
+        # si la variable tiene definicion, escribir el codigo intermedio
+        if ctx.getChild(2).getText() != '':
+            self.visitDefinicion(ctx.getChild(2))
+            with ManejoArchivo("output/codigo_intermedio.txt") as archivoCI:
+                archivoCI.write(
+                    '\n' + ctx.getChild(1).getText() + ' = ' + self.tmp.tActual)
+
+        # chequeo si hay mas variables en lista
+        if ctx.getChild(3).getText() != '':
+            self.visitLista_var(ctx.getChild(3))
+
+    def visitIf_stmt(self, ctx: compiladoresParser.If_stmtContext):
+        return self.visitChildren(ctx)
+
+    def visitElse_stmt(self, ctx: compiladoresParser.Else_stmtContext):
+        return self.visitChildren(ctx)
+
+    def visitFor_stmt(self, ctx: compiladoresParser.For_stmtContext):
+        return self.visitChildren(ctx)
+
+    def visitWhile_stmt(self, ctx: compiladoresParser.While_stmtContext):
+        return self.visitChildren(ctx)
+
+    def visitRetornar(self, ctx: compiladoresParser.RetornarContext):
+        return self.visitChildren(ctx)
+
+    def visitLlamada_funcion(self, ctx: compiladoresParser.Llamada_funcionContext):
+        return self.visitChildren(ctx)
+
+    def visitArgs_recibido(self, ctx: compiladoresParser.Args_recibidoContext):
+        return self.visitChildren(ctx)
+
+    def visitLista_args_recibido(self, ctx: compiladoresParser.Lista_args_recibidoContext):
+        return self.visitChildren(ctx)
+
+    def visitArgs_enviado(self, ctx: compiladoresParser.Args_enviadoContext):
+        return self.visitChildren(ctx)
+
+    def visitLista_args_enviado(self, ctx: compiladoresParser.Lista_args_enviadoContext):
+        return self.visitChildren(ctx)
+
+    def visitFuncion(self, ctx: compiladoresParser.FuncionContext):
+        return self.visitChildren(ctx)
+
     def visitOpal(self, ctx: compiladoresParser.OpalContext):
+        print("visitOpal".center(50, '*'))
         return self.visitExpresionl(ctx.getChild(0))
 
     def visitExpresionl(self, ctx: compiladoresParser.ExpresionlContext):
+        print("visitExpresionl".center(50, '*'))
+
         aux1 = self.visitTerminol(ctx.getChild(0))
         if ctx.getChild(1).getText() != '':
             aux2 = self.visitExpl(ctx.getChild(1))
@@ -51,6 +108,7 @@ class miVisitor(compiladoresVisitor):
         # si el hijo 3 no contiene nada, finaliza la recursividad
         if ctx.getChild(2).getText() == '':
             return self.tmp.tActual
+
         # se registra en archivo la suma o resta de los temporales que corresponde a
         # a cada expresion
         aux = self.visitExpl(ctx.getChild(2))
@@ -61,7 +119,6 @@ class miVisitor(compiladoresVisitor):
 
     def visitTerminol(self, ctx: compiladoresParser.TerminolContext):
         print("visitTerminol".center(50, '*'))
-
         if ctx.getChildCount() == 4:
             aux1 = self.visitExpresion(ctx.getChild(0))
             aux2 = self.visitExpresion(ctx.getChild(2))
@@ -86,9 +143,11 @@ class miVisitor(compiladoresVisitor):
         return self.visitExpresion(ctx.getChild(0))
 
     def visitTerml(self, ctx: compiladoresParser.TermlContext):
+        print("visitTerml".center(50, '*'))
         return self.visitExpresionl(ctx.getChild(1))
 
     def visitFactor(self, ctx: compiladoresParser.FactorContext):
+        print("visitFactor".center(50, '*'))
         if ctx.getChild(0).getText() == '(':
             return self.visitExpresionl(ctx.getChild(1))
         return self.visitChild(0).getText()
@@ -107,14 +166,11 @@ class miVisitor(compiladoresVisitor):
     # Visit a parse tree produced by compiladoresParser#exp.
     def visitExp(self, ctx: compiladoresParser.ExpContext):
         print("visitExp".center(50, '*'))
-
         aux1 = self.visitTermino(ctx.getChild(1))
-
         # caso base recursividad
         # si el hijo 3 no contiene nada, finaliza la recursividad
         if ctx.getChild(2).getText() == '':
             return self.tmp.tActual
-
         # se registra en archivo la suma o resta de los temporales que corresponde a
         # a cada expresion
         aux = self.visitExp(ctx.getChild(2))
@@ -122,8 +178,6 @@ class miVisitor(compiladoresVisitor):
             archivoCI.write('\n' + self.tmp.t + ' = ' + aux1 +
                             ' ' + ctx.getChild(2).getChild(0).getText() + ' ' + aux)
         return self.tmp.tActual
-
-        # return self.visitChildren(ctx)
 
     def visitTermino(self, ctx: compiladoresParser.TerminoContext):
         print("visitTermino".center(50, '*'))
@@ -144,6 +198,7 @@ class miVisitor(compiladoresVisitor):
         return self.tmp.tActual
 
     def visitTerm(self, ctx: compiladoresParser.TermContext):
+        print("visitTerm".center(50, '*'))
         # corrobora si el factor es una expresion encerrada entre parentesis
         if ctx.getChild(1).getChild(0).getText() == '(':
             self.visitFactor(ctx.getChild(1))

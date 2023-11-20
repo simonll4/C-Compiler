@@ -1,7 +1,7 @@
 from compiladoresParser import compiladoresParser
 from compiladoresVisitor import compiladoresVisitor
-from ManejoArchivo import *
-from Temporales import *
+from util.ManejoArchivo import *
+from util.Temporales import *
 
 
 class miVisitor(compiladoresVisitor):
@@ -119,6 +119,7 @@ class miVisitor(compiladoresVisitor):
 
     def visitTerminol(self, ctx: compiladoresParser.TerminolContext):
         print("visitTerminol".center(50, '*'))
+
         if ctx.getChildCount() == 4:
             aux1 = self.visitExpresion(ctx.getChild(0))
             aux2 = self.visitExpresion(ctx.getChild(2))
@@ -132,6 +133,7 @@ class miVisitor(compiladoresVisitor):
                     archivoCI.write('\n' + self.tmp.t + ' = ' + aux3 + ' ' +
                                     ctx.getChild(3).getChild(0).getText() + ' ' + aux4)
             return self.tmp.tActual
+
         elif ctx.getChildCount() == 2:
             aux1 = self.visitExpresion(ctx.getChild(0))
             if ctx.getChild(1).getText() != '':
@@ -199,6 +201,7 @@ class miVisitor(compiladoresVisitor):
 
     def visitTerm(self, ctx: compiladoresParser.TermContext):
         print("visitTerm".center(50, '*'))
+
         # corrobora si el factor es una expresion encerrada entre parentesis
         if ctx.getChild(1).getChild(0).getText() == '(':
             self.visitFactor(ctx.getChild(1))

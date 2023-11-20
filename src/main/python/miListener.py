@@ -6,11 +6,11 @@ else:
 
 from compiladoresListener import compiladoresListener
 
-from TS import TS
-from Contexto import Contexto
-from ID import *
-from Util import *
-from ManejoArchivo import *
+from tabla_simbolos.TS import TS
+from tabla_simbolos.Contexto import Contexto
+from tabla_simbolos.ID import *
+from util.Util import *
+from util.ManejoArchivo import *
 
 
 class miListener(compiladoresListener):

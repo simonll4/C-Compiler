@@ -1,5 +1,5 @@
-from ID import *
-from Contexto import Contexto
+from tabla_simbolos.ID import *
+from tabla_simbolos.Contexto import Contexto
 
 
 class TS():

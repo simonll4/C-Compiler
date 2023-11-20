@@ -11,5 +11,9 @@
     "antlr4.debug": {
         "visualParseTreeHorizontal": false,
         "visualParseTreeClustered": true
-    }
+    },
+    "python.analysis.extraPaths": [
+        "./src/main/python/tabla_simbolos",
+        "./src/main/python/util"
+    ]
 }

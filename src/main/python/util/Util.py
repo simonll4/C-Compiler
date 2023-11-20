@@ -1,5 +1,5 @@
-from ID import *
-from TS import *
+from tabla_simbolos.ID import *
+from tabla_simbolos.TS import *
 
 
 class Util:

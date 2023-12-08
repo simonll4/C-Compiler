@@ -78,13 +78,17 @@ class miVisitor(compiladoresVisitor):
 
     def visitFor_stmt(self, ctx: compiladoresParser.For_stmtContext):
 
-        # se resuelve la asignacion
+        # se resuelve la asignacion de la variable de iteracion del bucle
         self.visitAsignacion(ctx.getChild(2))
+
+        # se escribe la etiqueta para mantenerse en bucle
+        with ManejoArchivo("output/codigo_intermedio.txt") as archivoCI:
+            archivoCI.write(f'\nlabel {self.tmp.l()}')
+
         # se obtiene el temporal que tiene la condicion del ciclo
         condicion = self.visitOpal(ctx.getChild(4))
 
         with ManejoArchivo("output/codigo_intermedio.txt") as archivoCI:
-            archivoCI.write(f'\nlabel {self.tmp.l()}')
             archivoCI.write(f'\nifnot {condicion} jmp {self.tmp.l()}')
 
         # se resuelve el bloque de codigo del bucle
@@ -92,12 +96,31 @@ class miVisitor(compiladoresVisitor):
         # se resuelve el incremento del bucle
         self.visitAsignacion(ctx.getChild(6))
 
+        # etiqueta de salto para volver a tomar el bucle
+        # etiqueta de salteo de bucle
         with ManejoArchivo("output/codigo_intermedio.txt") as archivoCI:
             archivoCI.write(f'\njmp {self.tmp.lAnterior()}')
             archivoCI.write(f'\nlabel {self.tmp.lActual()}')
 
     def visitWhile_stmt(self, ctx: compiladoresParser.While_stmtContext):
-        return self.visitChildren(ctx)
+        # se escribe la etiqueta para mantenerse en bucle
+        with ManejoArchivo("output/codigo_intermedio.txt") as archivoCI:
+            archivoCI.write(f'\nlabel {self.tmp.l()}')
+
+        # se obtiene el temporal que tiene la condicion del ciclo
+        condicion = self.visitOpal(ctx.getChild(2))
+
+        with ManejoArchivo("output/codigo_intermedio.txt") as archivoCI:
+            archivoCI.write(f'\nifnot {condicion} jmp {self.tmp.l()}')
+
+        # se resuelve el bloque de codigo del bucle
+        self.visitInstruccion(ctx.getChild(4))
+
+        # etiqueta de salto para volver a tomar el bucle
+        # etiqueta de salteo de bucle
+        with ManejoArchivo("output/codigo_intermedio.txt") as archivoCI:
+            archivoCI.write(f'\njmp {self.tmp.lAnterior()}')
+            archivoCI.write(f'\nlabel {self.tmp.lActual()}')
 
     def visitRetornar(self, ctx: compiladoresParser.RetornarContext):
         return self.visitChildren(ctx)

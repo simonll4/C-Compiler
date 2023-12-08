@@ -23,23 +23,21 @@ class miVisitor(compiladoresVisitor):
             self.visitDefinicion(ctx.getChild(2))
             with ManejoArchivo("output/codigo_intermedio.txt") as archivoCI:
                 archivoCI.write(
-                    '\n' + ctx.getChild(1).getText() + ' = ' + self.tmp.tActual)
+                    '\n' + ctx.getChild(1).getText() + ' = ' + self.tmp.tActual())
 
         if ctx.getChild(3).getText() != '':
             self.visitLista_var(ctx.getChild(3))
 
     def visitDefinicion(self, ctx: compiladoresParser.DefinicionContext):
         print("visitDefinicion".center(50, '*'))
-
         return self.visitOpal(ctx.getChild(1))
 
     def visitAsignacion(self, ctx: compiladoresParser.AsignacionContext):
         print("visitAsignacion".center(50, '*'))
-
         self.visitOpal(ctx.getChild(2))
         with ManejoArchivo("output/codigo_intermedio.txt") as archivoCI:
             archivoCI.write('\n' + ctx.getChild(0).getText() +
-                            ' = ' + self.tmp.tActual)
+                            ' = ' + self.tmp.tActual())
 
     def visitLista_var(self, ctx: compiladoresParser.Lista_varContext):
         print("visitLista_var".center(50, '*'))
@@ -49,7 +47,7 @@ class miVisitor(compiladoresVisitor):
             self.visitDefinicion(ctx.getChild(2))
             with ManejoArchivo("output/codigo_intermedio.txt") as archivoCI:
                 archivoCI.write(
-                    '\n' + ctx.getChild(1).getText() + ' = ' + self.tmp.tActual)
+                    '\n' + ctx.getChild(1).getText() + ' = ' + self.tmp.tActual())
 
         # chequeo si hay mas variables en lista
         if ctx.getChild(3).getText() != '':
@@ -59,27 +57,44 @@ class miVisitor(compiladoresVisitor):
         aux = self.visitOpal(ctx.getChild(2))
         with ManejoArchivo("output/codigo_intermedio.txt") as archivoCI:
             archivoCI.write(
-                f'\n{ctx.getChild(0).getText()} {aux} jmp {self.tmp.l}')
-            archivoCI.write(f'\njmp {self.tmp.l}')
-            archivoCI.write(f'\nlabel {self.tmp.lAnterior}')
+                f'\n{ctx.getChild(0).getText()} {aux} jmp {self.tmp.l()}')
+            archivoCI.write(f'\njmp {self.tmp.l()}')
+            archivoCI.write(f'\nlabel {self.tmp.lAnterior()}')
         self.visitInstruccion(ctx.getChild(4))
 
         # en caso de que haya else
         if ctx.getChildCount() == 6:
             with ManejoArchivo("output/codigo_intermedio.txt") as archivoCI:
-                archivoCI.write(f'\njump {self.tmp.l}')
+                archivoCI.write(f'\njump {self.tmp.l()}')
             self.visitElse_stmt(ctx.getChild(5))
 
         with ManejoArchivo("output/codigo_intermedio.txt") as archivoCI:
-            archivoCI.write(f'\nlabel {self.tmp.lActual}')
+            archivoCI.write(f'\nlabel {self.tmp.lActual()}')
 
     def visitElse_stmt(self, ctx: compiladoresParser.Else_stmtContext):
         with ManejoArchivo("output/codigo_intermedio.txt") as archivoCI:
-            archivoCI.write(f'\nlabel {self.tmp.lAnterior}:')
+            archivoCI.write(f'\nlabel {self.tmp.lAnterior()}:')
         return self.visitBloque(ctx.getChild(1))
 
     def visitFor_stmt(self, ctx: compiladoresParser.For_stmtContext):
-        return self.visitChildren(ctx)
+
+        # se resuelve la asignacion
+        self.visitAsignacion(ctx.getChild(2))
+        # se obtiene el temporal que tiene la condicion del ciclo
+        condicion = self.visitOpal(ctx.getChild(4))
+
+        with ManejoArchivo("output/codigo_intermedio.txt") as archivoCI:
+            archivoCI.write(f'\nlabel {self.tmp.l()}')
+            archivoCI.write(f'\nifnot {condicion} jmp {self.tmp.l()}')
+
+        # se resuelve el bloque de codigo del bucle
+        self.visitInstruccion(ctx.getChild(8))
+        # se resuelve el incremento del bucle
+        self.visitAsignacion(ctx.getChild(6))
+
+        with ManejoArchivo("output/codigo_intermedio.txt") as archivoCI:
+            archivoCI.write(f'\njmp {self.tmp.lAnterior()}')
+            archivoCI.write(f'\nlabel {self.tmp.lActual()}')
 
     def visitWhile_stmt(self, ctx: compiladoresParser.While_stmtContext):
         return self.visitChildren(ctx)
@@ -116,9 +131,9 @@ class miVisitor(compiladoresVisitor):
         if ctx.getChild(1).getText() != '':
             aux2 = self.visitExpl(ctx.getChild(1))
             with ManejoArchivo("output/codigo_intermedio.txt") as archivoCI:
-                archivoCI.write('\n' + self.tmp.t + ' = ' + aux1 + ' ' +
+                archivoCI.write('\n' + self.tmp.t() + ' = ' + aux1 + ' ' +
                                 ctx.getChild(1).getChild(0).getText() + ' ' + aux2)
-        return self.tmp.tActual
+        return self.tmp.tActual()
 
     def visitExpl(self, ctx: compiladoresParser.ExplContext):
         print("visitExpl".center(50, '*'))
@@ -127,7 +142,7 @@ class miVisitor(compiladoresVisitor):
         # caso base recursividad
         # si el hijo 3 no contiene nada, finaliza la recursividad
         if ctx.getChild(2).getText() == '':
-            return self.tmp.tActual
+            return self.tmp.tActual()
 
         # se registra en archivo la suma o resta de los temporales que corresponde a
         # a cada expresion
@@ -135,7 +150,7 @@ class miVisitor(compiladoresVisitor):
         with ManejoArchivo("output/codigo_intermedio.txt") as archivoCI:
             archivoCI.write('\n' + self.tmp.t + ' = ' + aux1 +
                             ' ' + ctx.getChild(2).getChild(0).getText() + ' ' + aux)
-        return self.tmp.tActual
+        return self.tmp.tActual()
 
     def visitTerminol(self, ctx: compiladoresParser.TerminolContext):
         print("visitTerminol".center(50, '*'))
@@ -143,25 +158,25 @@ class miVisitor(compiladoresVisitor):
         if ctx.getChildCount() == 4:
             aux1 = self.visitExpresion(ctx.getChild(0))
             aux2 = self.visitExpresion(ctx.getChild(2))
-            aux3 = self.tmp.t
+            aux3 = self.tmp.t()
             with ManejoArchivo("output/codigo_intermedio.txt") as archivoCI:
                 archivoCI.write('\n' + aux3 + ' = ' + aux1 + ' ' +
                                 ctx.getChild(1).getChild(0).getText() + ' ' + aux2)
             if ctx.getChild(3).getText() != '':
                 aux4 = self.visitTerml(ctx.getChild(3))
                 with ManejoArchivo("output/codigo_intermedio.txt") as archivoCI:
-                    archivoCI.write('\n' + self.tmp.t + ' = ' + aux3 + ' ' +
+                    archivoCI.write('\n' + self.tmp.t() + ' = ' + aux3 + ' ' +
                                     ctx.getChild(3).getChild(0).getText() + ' ' + aux4)
-            return self.tmp.tActual
+            return self.tmp.tActual()
 
         elif ctx.getChildCount() == 2:
             aux1 = self.visitExpresion(ctx.getChild(0))
             if ctx.getChild(1).getText() != '':
                 aux2 = self.visitTerml(ctx.getChild(1))
                 with ManejoArchivo("output/codigo_intermedio.txt") as archivoCI:
-                    archivoCI.write('\n' + self.tmp.t + ' = ' + aux1 + ' ' +
+                    archivoCI.write('\n' + self.tmp.t() + ' = ' + aux1 + ' ' +
                                     ctx.getChild(1).getChild(0).getText() + ' ' + aux2)
-            return self.tmp.tActual
+            return self.tmp.tActual()
         return self.visitExpresion(ctx.getChild(0))
 
     def visitTerml(self, ctx: compiladoresParser.TermlContext):
@@ -181,9 +196,9 @@ class miVisitor(compiladoresVisitor):
         if ctx.getChild(1).getText() != '':
             aux2 = self.visitExp(ctx.getChild(1))
             with ManejoArchivo("output/codigo_intermedio.txt") as archivoCI:
-                archivoCI.write('\n' + self.tmp.t + ' = ' + aux + ' ' +
+                archivoCI.write('\n' + self.tmp.t() + ' = ' + aux + ' ' +
                                 ctx.getChild(1).getChild(0).getText() + ' ' + aux2)
-        return self.tmp.tActual
+        return self.tmp.tActual()
 
     # Visit a parse tree produced by compiladoresParser#exp.
     def visitExp(self, ctx: compiladoresParser.ExpContext):
@@ -192,14 +207,14 @@ class miVisitor(compiladoresVisitor):
         # caso base recursividad
         # si el hijo 3 no contiene nada, finaliza la recursividad
         if ctx.getChild(2).getText() == '':
-            return self.tmp.tActual
+            return self.tmp.tActual()
         # se registra en archivo la suma o resta de los temporales que corresponde a
         # a cada expresion
         aux = self.visitExp(ctx.getChild(2))
         with ManejoArchivo("output/codigo_intermedio.txt") as archivoCI:
-            archivoCI.write('\n' + self.tmp.t + ' = ' + aux1 +
+            archivoCI.write('\n' + self.tmp.t() + ' = ' + aux1 +
                             ' ' + ctx.getChild(2).getChild(0).getText() + ' ' + aux)
-        return self.tmp.tActual
+        return self.tmp.tActual()
 
     def visitTermino(self, ctx: compiladoresParser.TerminoContext):
         print("visitTermino".center(50, '*'))
@@ -209,15 +224,15 @@ class miVisitor(compiladoresVisitor):
             if ctx.getChild(1).getText() != '':
                 a = self.visitTerm(ctx.getChild(1))
                 with ManejoArchivo("output/codigo_intermedio.txt") as archivoCI:
-                    archivoCI.write('\n' + self.tmp.t + ' = ' + b + ' ' +
+                    archivoCI.write('\n' + self.tmp.t() + ' = ' + b + ' ' +
                                     ctx.getChild(1).getChild(0).getText() + ' ' + a)
         else:
             with ManejoArchivo("output/codigo_intermedio.txt") as archivoCI:
-                archivoCI.write('\n' + self.tmp.t + ' = ' +
+                archivoCI.write('\n' + self.tmp.t() + ' = ' +
                                 str(ctx.getChild(0).getText()))
             if ctx.getChild(1).getText() != '':
                 return self.visitTerm(ctx.getChild(1))
-        return self.tmp.tActual
+        return self.tmp.tActual()
 
     def visitTerm(self, ctx: compiladoresParser.TermContext):
         print("visitTerm".center(50, '*'))
@@ -229,10 +244,10 @@ class miVisitor(compiladoresVisitor):
         # grabar en archivo tnuevo = tanterior + valor
         else:
             with ManejoArchivo("output/codigo_intermedio.txt") as archivoCI:
-                archivoCI.write('\n' + self.tmp.t + ' = ' + self.tmp.tAnterior +
+                archivoCI.write('\n' + self.tmp.t() + ' = ' + self.tmp.tAnterior() +
                                 ' ' + ctx.getChild(0).getText() + ' ' + ctx.getChild(1).getText())
         # caso base recursividad
         # si el hijo 3 no contiene nada, finaliza la recursividad
         if ctx.getChild(2).getText() == '':
-            return self.tmp.tActual
+            return self.tmp.tActual()
         return self.visitTerm(ctx.getChild(2))

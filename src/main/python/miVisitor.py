@@ -156,7 +156,7 @@ class miVisitor(compiladoresVisitor):
         with ManejoArchivo("output/codigo_intermedio.txt") as archivoCI:
             archivoCI.write(f'\npush {str(listaEtiquetas[0])}')
             archivoCI.write(f'\njmp {str(listaEtiquetas[1])}')
-            # archivoCI.write(f'\npop {ctx.}')
+            archivoCI.write(f'\nlabel {str(listaEtiquetas[0])}')
 
     def visitArgs_enviado(self, ctx: compiladoresParser.Args_enviadoContext):
         with ManejoArchivo("output/codigo_intermedio.txt") as archivoCI:
@@ -182,8 +182,10 @@ class miVisitor(compiladoresVisitor):
         listaEtiquetas = self.tmp.lFuncion(ctx.getChild(1).getText())
         with ManejoArchivo("output/codigo_intermedio.txt") as archivoCI:
             archivoCI.write(f'\nlabel {listaEtiquetas[1]}')
+        # verifica si hay parametros dentro del argumento de la funcion
         # push de los parametros pasados como argumento a la funcion
-        self.visitArgs_recibido(ctx.getChild(3))
+        if ctx.getChild(3).getText() != '':
+            self.visitArgs_recibido(ctx.getChild(3))
         # grabar el pop de la etiqueta
         with ManejoArchivo("output/codigo_intermedio.txt") as archivoCI:
             archivoCI.write(f'\npop {listaEtiquetas[0]}')

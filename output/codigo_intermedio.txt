@@ -1,12 +1,14 @@
 
-label l1 
-pop a
-pop b
-pop hola
-pop fg
-pop l0 
-t0  = a
-t1  = b
-t2  = t0 + t1
-push t2
-jmp l0 
+t0  = 0
+x = t0
+label l0 
+t1  = x
+t2  = 10
+t3  = t1 != t2
+ifnot t3 jmp l1 
+t4  = x
+t5  = 2
+t6  = t4 + t5
+x = t6
+jmp l0
+label l1

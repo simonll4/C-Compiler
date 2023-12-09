@@ -1,6 +1,7 @@
 
 
+int x = 0;
 
-int funcion (int a, int b, int hola, int fg){
-    return a + b ;
+while (x != 10){
+    x = x + 2;
 }

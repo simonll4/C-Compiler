@@ -6,6 +6,9 @@ from util.Etiquetas import *
 
 class miVisitor(compiladoresVisitor):
     tmp = Etiquetas()
+
+    funcion = False
+
     with ManejoArchivo("output/codigo_intermedio.txt") as archivoCI:
         archivoCI.truncate(0)
 
@@ -13,8 +16,23 @@ class miVisitor(compiladoresVisitor):
         print("visitPrograma".center(50, '*'))
         return self.visitChildren(ctx)
 
-    def visitInstruccion(self, ctx: compiladoresParser.InstruccionContext):
+    def visitInstrucciones(self, ctx: compiladoresParser.InstruccionesContext):
+        if self.funcion:
+            return self.visitInstruccion(ctx.getChild(0))
         return self.visitChildren(ctx)
+
+    def visitInstruccion(self, ctx: compiladoresParser.InstruccionContext):
+        if self.funcion:
+            return self.visitRetornar(ctx.getChild(0))
+        return self.visitChildren(ctx)
+
+    def visitRetornar(self, ctx: compiladoresParser.RetornarContext):
+        if self.funcion:
+            return self.visitOpal(ctx.getChild(2))
+        return self.visitChildren(ctx)
+
+    def visitBloque(self, ctx: compiladoresParser.BloqueContext):
+        return self.visitInstrucciones(ctx.getChild(1))
 
     def visitDeclaracion(self, ctx: compiladoresParser.DeclaracionContext):
         print("visitDeclaracion".center(50, '*'))
@@ -34,10 +52,17 @@ class miVisitor(compiladoresVisitor):
 
     def visitAsignacion(self, ctx: compiladoresParser.AsignacionContext):
         print("visitAsignacion".center(50, '*'))
-        self.visitOpal(ctx.getChild(2))
-        with ManejoArchivo("output/codigo_intermedio.txt") as archivoCI:
-            archivoCI.write('\n' + ctx.getChild(0).getText() +
-                            ' = ' + self.tmp.tActual())
+
+        # esto sirve para verificar si se trata de un llamado a funcion
+        if ctx.getChild(2).getChild(0).getChild(0).getChild(0).getChild(0).getChild(0).getChild(0).getChildCount():
+            self.visitOpal(ctx.getChild(2))
+            with ManejoArchivo("output/codigo_intermedio.txt") as archivoCI:
+                archivoCI.write(f'\npop {ctx.getChild(0).getText()}')
+        else:
+            self.visitOpal(ctx.getChild(2))
+            with ManejoArchivo("output/codigo_intermedio.txt") as archivoCI:
+                archivoCI.write(
+                    '\n' + ctx.getChild(0).getText() + ' = ' + self.tmp.tActual())
 
     def visitLista_var(self, ctx: compiladoresParser.Lista_varContext):
         print("visitLista_var".center(50, '*'))
@@ -77,7 +102,6 @@ class miVisitor(compiladoresVisitor):
         return self.visitBloque(ctx.getChild(1))
 
     def visitFor_stmt(self, ctx: compiladoresParser.For_stmtContext):
-
         # se resuelve la asignacion de la variable de iteracion del bucle
         self.visitAsignacion(ctx.getChild(2))
 
@@ -126,22 +150,68 @@ class miVisitor(compiladoresVisitor):
         return self.visitChildren(ctx)
 
     def visitLlamada_funcion(self, ctx: compiladoresParser.Llamada_funcionContext):
-        return self.visitChildren(ctx)
+        listaEtiquetas = self.tmp.lFuncion(ctx.getChild(0).getText())
+        self.visitArgs_enviado(ctx.getChild(2))
 
-    def visitArgs_recibido(self, ctx: compiladoresParser.Args_recibidoContext):
-        return self.visitChildren(ctx)
-
-    def visitLista_args_recibido(self, ctx: compiladoresParser.Lista_args_recibidoContext):
-        return self.visitChildren(ctx)
+        with ManejoArchivo("output/codigo_intermedio.txt") as archivoCI:
+            archivoCI.write(f'\npush {str(listaEtiquetas[0])}')
+            archivoCI.write(f'\njmp {str(listaEtiquetas[1])}')
+            # archivoCI.write(f'\npop {ctx.}')
 
     def visitArgs_enviado(self, ctx: compiladoresParser.Args_enviadoContext):
-        return self.visitChildren(ctx)
+        with ManejoArchivo("output/codigo_intermedio.txt") as archivoCI:
+            archivoCI.write(f'\npush {ctx.getChild(0).getText()}')
+
+        # verifico si hay mas parametros en el argumento
+        # si hay visito a la lista de argumentos
+        if ctx.getChild(1).getText() != '':
+            self.visitLista_args_enviado(ctx.getChild(1))
+        return 1
 
     def visitLista_args_enviado(self, ctx: compiladoresParser.Lista_args_enviadoContext):
-        return self.visitChildren(ctx)
+        with ManejoArchivo("output/codigo_intermedio.txt") as archivoCI:
+            archivoCI.write(f'\npush {ctx.getChild(1).getText()}')
+        # verifico si hay mas parametros en el argumento
+        # si hay sigo la recursion
+        if ctx.getChild(2).getText() != '':
+            self.visitLista_args_enviado(ctx.getChild(2))
+        return 1
 
     def visitFuncion(self, ctx: compiladoresParser.FuncionContext):
-        return self.visitChildren(ctx)
+        self.funcion = True
+        listaEtiquetas = self.tmp.lFuncion(ctx.getChild(1).getText())
+        with ManejoArchivo("output/codigo_intermedio.txt") as archivoCI:
+            archivoCI.write(f'\nlabel {listaEtiquetas[1]}')
+        # push de los parametros pasados como argumento a la funcion
+        self.visitArgs_recibido(ctx.getChild(3))
+        # grabar el pop de la etiqueta
+        with ManejoArchivo("output/codigo_intermedio.txt") as archivoCI:
+            archivoCI.write(f'\npop {listaEtiquetas[0]}')
+        # se resuelve lo que esta dentro del bloque
+        aux = self.visitBloque(ctx.getChild(5))
+        self.funcion = False
+        with ManejoArchivo("output/codigo_intermedio.txt") as archivoCI:
+            archivoCI.write(f'\npush {aux}')
+            archivoCI.write(f'\njmp {listaEtiquetas[0]}')
+
+    def visitArgs_recibido(self, ctx: compiladoresParser.Args_recibidoContext):
+        with ManejoArchivo("output/codigo_intermedio.txt") as archivoCI:
+            archivoCI.write(f'\npop {ctx.getChild(1).getText()}')
+
+        # verifico si hay mas parametros en el argumento
+        # si hay visito a la lista de argumentos
+        if ctx.getChild(2).getText() != '':
+            self.visitLista_args_recibido(ctx.getChild(2))
+        return 1
+
+    def visitLista_args_recibido(self, ctx: compiladoresParser.Lista_args_recibidoContext):
+        with ManejoArchivo("output/codigo_intermedio.txt") as archivoCI:
+            archivoCI.write(f'\npop {ctx.getChild(2).getText()}')
+        # verifico si hay mas parametros en el argumento
+        # si hay sigo la recursion
+        if ctx.getChild(3).getText() != '':
+            self.visitLista_args_recibido(ctx.getChild(3))
+        return 1
 
     def visitOpal(self, ctx: compiladoresParser.OpalContext):
         print("visitOpal".center(50, '*'))
@@ -149,6 +219,10 @@ class miVisitor(compiladoresVisitor):
 
     def visitExpresionl(self, ctx: compiladoresParser.ExpresionlContext):
         print("visitExpresionl".center(50, '*'))
+
+        # para llamada a funcion
+        if ctx.getChild(0).getChild(0).getChild(0).getChild(0).getChild(0).getChildCount() == 4:
+            return self.visitTerminol(ctx.getChild(0))
 
         aux1 = self.visitTerminol(ctx.getChild(0))
         if ctx.getChild(1).getText() != '':
@@ -177,6 +251,10 @@ class miVisitor(compiladoresVisitor):
 
     def visitTerminol(self, ctx: compiladoresParser.TerminolContext):
         print("visitTerminol".center(50, '*'))
+
+        # para llamada funcion
+        if ctx.getChild(0).getChild(0).getChild(0).getChild(0).getChildCount() == 4:
+            return self.visitExpresion(ctx.getChild(0))
 
         if ctx.getChildCount() == 4:
             aux1 = self.visitExpresion(ctx.getChild(0))
@@ -208,12 +286,23 @@ class miVisitor(compiladoresVisitor):
 
     def visitFactor(self, ctx: compiladoresParser.FactorContext):
         print("visitFactor".center(50, '*'))
-        if ctx.getChild(0).getText() == '(':
-            return self.visitExpresionl(ctx.getChild(1))
-        return self.visitChild(0).getText()
+
+        # # si la cantidad de hijos del hijo del hijo del
+        # # factor es 4, entonces es una llamada a funcion
+        if ctx.getChild(0).getChildCount() == 4:
+            self.visitLlamada_funcion(ctx.getChild(0))
+            return 1
+        else:
+            if ctx.getChild(0).getText() == '(':
+                return self.visitExpresionl(ctx.getChild(1))
+            return self.visitChild(0).getText()
 
     def visitExpresion(self, ctx: compiladoresParser.ExpresionContext):
         print("visitExpresion".center(50, '*'))
+
+        # para llamada a funcion
+        if ctx.getChild(0).getChild(0).getChild(0).getChildCount() == 4:
+            return self.visitTermino(ctx.getChild(0))
 
         aux = self.visitTermino(ctx.getChild(0))
         if ctx.getChild(1).getText() != '':
@@ -241,20 +330,25 @@ class miVisitor(compiladoresVisitor):
 
     def visitTermino(self, ctx: compiladoresParser.TerminoContext):
         print("visitTermino".center(50, '*'))
-        # corrobora si el factor es una expresion encerrada entre parentesis
-        if ctx.getChild(0).getChild(0).getText() == '(':
-            b = self.visitFactor(ctx.getChild(0))
-            if ctx.getChild(1).getText() != '':
-                a = self.visitTerm(ctx.getChild(1))
-                with ManejoArchivo("output/codigo_intermedio.txt") as archivoCI:
-                    archivoCI.write('\n' + self.tmp.t() + ' = ' + b + ' ' +
-                                    ctx.getChild(1).getChild(0).getText() + ' ' + a)
+
+        # se fija si es una  llamda a funcion al tener 4 hijos
+        if ctx.getChild(0).getChild(0).getChildCount() == 4:
+            return self.visitFactor(ctx.getChild(0))
         else:
-            with ManejoArchivo("output/codigo_intermedio.txt") as archivoCI:
-                archivoCI.write('\n' + self.tmp.t() + ' = ' +
-                                str(ctx.getChild(0).getText()))
-            if ctx.getChild(1).getText() != '':
-                return self.visitTerm(ctx.getChild(1))
+            # corrobora si el factor es una expresion encerrada entre parentesis
+            if ctx.getChild(0).getChild(0).getText() == '(':
+                b = self.visitFactor(ctx.getChild(0))
+                if ctx.getChild(1).getText() != '':
+                    a = self.visitTerm(ctx.getChild(1))
+                    with ManejoArchivo("output/codigo_intermedio.txt") as archivoCI:
+                        archivoCI.write('\n' + self.tmp.t() + ' = ' + b + ' ' +
+                                        ctx.getChild(1).getChild(0).getText() + ' ' + a)
+            else:
+                with ManejoArchivo("output/codigo_intermedio.txt") as archivoCI:
+                    archivoCI.write('\n' + self.tmp.t() + ' = ' +
+                                    str(ctx.getChild(0).getText()))
+                if ctx.getChild(1).getText() != '':
+                    return self.visitTerm(ctx.getChild(1))
         return self.tmp.tActual()
 
     def visitTerm(self, ctx: compiladoresParser.TermContext):

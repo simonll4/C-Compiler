@@ -4,10 +4,16 @@
 
 
 class Etiquetas:
-    _listaTmp = []  # lleva el orden de los temporales creados
-    _tmp = -1  # contador de temporales
-    _listaLbl = []  # lleva el ordes de los temporales creados
-    _lbl = -1  # contador de etiquetas
+    # lleva el orden de los temporales creados
+    _listaTmp = []
+    # contador de temporales
+    _tmp = -1
+    # lleva el ordes de los temporales creados
+    _listaLbl = []
+    # contador de etiquetas
+    _lbl = -1
+    # dict = {<ID> : [label1, label2]} mapea cada ID con una lista de etiquetas usadas en la funcion
+    _lblFuncion = dict()
 
     # registra un nuevo temporal y lo retorna en forma de cadena
     def t(self):
@@ -36,3 +42,21 @@ class Etiquetas:
     # retorna la ultima etiqueta agregada a la lista en forma de cadena
     def lActual(self):
         return f'l{Etiquetas._listaLbl[-1]}'
+
+    # retorna una lista de 2 etiquetas que son usadas en una llamda a
+    # funcion o en la declaracion de la misma
+    def lFuncion(self, identificador) -> list:
+
+        # si ya esta el identificador de
+        # la funcion, obtengo las etiquetas
+        for id in Etiquetas._lblFuncion:
+            if str(id) == str(identificador):
+                return Etiquetas._lblFuncion[str(identificador)]
+
+        # si el identificador no esta
+        # tengo que crear las dos etiquetas
+        lista = []
+        lista.append(Etiquetas.l(self))  # agrego la primer etiqueta
+        lista.append(Etiquetas.l(self))  # agrego la segunda etiqueta
+        Etiquetas._lblFuncion[str(identificador)] = lista
+        return lista

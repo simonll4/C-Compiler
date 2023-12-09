@@ -1,8 +1,6 @@
 
-int i = 0;
-int x = 10;
 
-while (i != x){
-    i = i + 1;
+
+int funcion (int a, int b, int hola, int fg){
+    return a + b ;
 }
-

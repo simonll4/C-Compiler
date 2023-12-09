@@ -125,13 +125,13 @@ prototipo_funcion : tipo_dato ID PA args_recibido PC;
 
 funcion : tipo_dato ID PA args_recibido PC bloque ;
 
-llamada_funcion : ID PA args_enviado PC;
-
 args_recibido : tipo_dato ID lista_args_recibido
               |;
 
 lista_args_recibido : COMA tipo_dato  ID lista_args_recibido
             | ;
+
+llamada_funcion : ID PA args_enviado PC;
 
 args_enviado : expresion lista_args_enviado
              |;

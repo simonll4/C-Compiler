@@ -1,5 +1,5 @@
 
 CONTEXTO[1]
 CONTEXTO[0]
-[ID: <class 'tabla_simbolos.ID.Variable'> nombre=i tDato=int inicializado=True accedido=False]
-[ID: <class 'tabla_simbolos.ID.Variable'> nombre=x tDato=int inicializado=True accedido=False]
+[ID: <class 'tabla_simbolos.ID.Funcion'> nombre=funcion tDato=int inicializado=False accedido=False]
+ args:{"[ID: <class 'tabla_simbolos.ID.Variable'> nombre=a tDato=int inicializado=False accedido=False][ID: <class 'tabla_simbolos.ID.Variable'> nombre=b tDato=int inicializado=False accedido=False][ID: <class 'tabla_simbolos.ID.Variable'> nombre=hola tDato=int inicializado=False accedido=False][ID: <class 'tabla_simbolos.ID.Variable'> nombre=fg tDato=int inicializado=False accedido=False]"}

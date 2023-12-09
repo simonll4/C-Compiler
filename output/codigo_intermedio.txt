@@ -1,16 +1,12 @@
 
-t0  = 0
-i = t0
-t1  = 10
-x = t1
-label l0 
-t2  = i
-t3  = x
-t4  = t2 != t3
-ifnot t4 jmp l1 
-t5  = i
-t6  = 1
-t7  = t5 + t6
-i = t7
-jmp l0
-label l1
+label l1 
+pop a
+pop b
+pop hola
+pop fg
+pop l0 
+t0  = a
+t1  = b
+t2  = t0 + t1
+push t2
+jmp l0 

@@ -1,27 +1,47 @@
 from tabla_simbolos.ID import *
 from tabla_simbolos.TS import *
+from util.ManejoArchivo import *
 
 
 class Util:
+    listaArgs = []
+    implFuncion = False
 
     # verifica: una variable (a) o varias separadas por comas (a,b,c)
     # devuelve los identificadores en forma de lista
     @staticmethod
-    def obtenerCantId(datos):
-        asignacion = datos.find('=')
-        if asignacion > 0:
-            datos = datos[:asignacion]
-        return datos.split(',')
+    def obtenerIdVariables(datos):
+        lista = []
+        identifacadores = datos.split(',')
+        for i in identifacadores:
+            asignacion = i.find('=')
+            if asignacion > 0:
+                lista.append(i[:asignacion])
+            else:
+                lista.append(i)
+        return lista
 
-    # verifica si se le asigna algo a la variable
+
     @staticmethod
-    def verificarInicializado(datos):
-        if datos.find('=') > 0:
-            if datos[datos.index('=') + 1:] != '':
-                return True
+    def verificarFuncion(datos):
+        if datos.find('(') > 0 and datos.find(')') > 0:
+            return True
         return False
 
-    # obtiene el nombre de la funcion
+    # devuelve una lista de booleanos de si esta inicializado o no
+    # las variables pasadas como datos
+    @staticmethod
+    def verificarInicializado(datos) -> list:
+        identificadores = datos.split(',')
+        listaInicializado = []
+
+        for i in identificadores:
+            if i.find('=') > 0 and i[i.index('=') + 1] != '':
+                listaInicializado.append(True)
+            else:
+                listaInicializado.append(False)
+        return listaInicializado
+
     @staticmethod
     def obtenerNombreFuncion(datos):
         indexPa = datos.index('(')  # obtengo indice donde abre el parentesis
@@ -31,9 +51,12 @@ class Util:
     @staticmethod
     def obtenerArgumentoFuncion(datos):
         listaArgumentos = []
-        indexPa = datos.index('(')
-        indexPc = datos.index(')')
-        argumento = datos[indexPa + 1:indexPc].split(',')
+        if '(' in datos and ')' in datos:
+            indexPa = datos.index('(')
+            indexPc = datos.index(')')
+            argumento = datos[indexPa + 1:indexPc].split(',')
+        else:
+            argumento = datos.split(',')
 
         for i in argumento:
             if i[:3] == 'int':
@@ -59,20 +82,27 @@ class Util:
     # compara la funcion implentada con el prototipo
     @staticmethod
     def verificarFuncionPrototipo(indentificador):
-        contextoGlobal = TS._pilaContexto[0].simbolos
-        for i in contextoGlobal:
+        simbolosContextoGlobal = TS._pilaContexto[0].simbolos
+        id = None
+        for i in simbolosContextoGlobal:
             if (indentificador.nombre == i):
-                id = contextoGlobal[i]
+                id = simbolosContextoGlobal[i]
                 break
-        if indentificador == id:
-            return True
-        else:
-            if indentificador.tDato != id.tDato:
-                print("TIPO DE DATO INCORRECTO".center(50, '-'))
+
+        # verificacion del tipo de dato de retorno
+        if indentificador.tDato != id.tDato:
+            with ManejoArchivo("output/listener/informeListener.txt") as archivoInforme:
+                archivoInforme.write(
+                    '\n' + f'TIPO DE DATO RETORNO [{indentificador.tDato}] INCORRECTO'.center(30, '-'))
+            return False
+        # verificacion de los tipos de datos del argumento
+        for i in range(0, len(id.args)):
+            if indentificador.args[i].tDato != id.args[i].tDato:
+                with ManejoArchivo("output/listener/informeListener.txt") as archivoInforme:
+                    archivoInforme.write(
+                        '\n' + f'TIPO DE DATO INCORRECTO PARAMETRO [{i}] DEL ARGUMENTO')
                 return False
-            if indentificador.args != id.args:
-                print("ARGUMENTO INCORRECTO".center(50, '-'))
-                return False
+        return True
 
     # devuelve el obejto ID dentro del diccionario(tabla simbolos) que pertenece al contexto
     @staticmethod
@@ -81,15 +111,34 @@ class Util:
             if clave == parametro:
                 return valor
 
+    # verifica que los parametros pasados correspondan con la declaracion
     @staticmethod
-    def verificarCantParametros(identificadorF, parametros) -> True:
-        if len(identificadorF.args) > len(parametros):
-            print(
-                "CANTIDAD DE ARGUMENTOS DECLARADOS EN EL PROTOTIPO MAYOR".center(80, '-'))
-            return False
-        if len(identificadorF.args) < len(parametros):
-            print("CANTIDAD DE PARAMETROS EN LA LLAMADA A FUNCION MAYOR".center(80, '-'))
-            return False
+    def verificarParametros(identificadorF, parametros) -> True:
+
+        listaId = []
+        tablaSimbolos = TS()
+        contexto = None
+
+        # busco los ID que corresponde con los parametros
+        for i in parametros:
+            contexto = tablaSimbolos.buscarIdGlobal(i)
+            if contexto:
+                id = contexto._simbolos[i]
+                listaId.append(id)
+
+        # verificacion de misma cantidad de parametros
+        if len(identificadorF.args) == len(parametros):
+            for i in range(0, len(identificadorF.args)):
+                if identificadorF.args[i].tDato != listaId[i].tDato:
+                    with ManejoArchivo("output/listener/informeListener.txt") as archivoInforme:
+                        archivoInforme.write(
+                            '\n' + f'TIPO DE DATO INCORRECTO PARAMETRO [{i}] DEL ARGUMENTO')
+                    return False
+        else:
+            with ManejoArchivo("output/listener/informeListener.txt") as archivoInforme:
+                archivoInforme.write(
+                    '\n' + f'CANTIDAD INVALIDA DE PARAMETROS DE LA FUNCION [{identificadorF.nombre}] ')
+                return False
         return True
 
 

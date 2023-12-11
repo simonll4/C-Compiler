@@ -46,13 +46,11 @@ class Etiquetas:
     # retorna una lista de 2 etiquetas que son usadas en una llamda a
     # funcion o en la declaracion de la misma
     def lFuncion(self, identificador) -> list:
-
         # si ya esta el identificador de
         # la funcion, obtengo las etiquetas
         for id in Etiquetas._lblFuncion:
             if str(id) == str(identificador):
                 return Etiquetas._lblFuncion[str(identificador)]
-
         # si el identificador no esta
         # tengo que crear las dos etiquetas
         lista = []

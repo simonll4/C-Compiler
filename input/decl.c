@@ -1,7 +1,12 @@
 
 
-int x = 0;
+double funcion(int w);
 
-while (x != 10){
-    x = x + 2;
+int main(){
+    int x = 4;
+
+    int a = funcion(x);
+
 }
+
+

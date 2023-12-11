@@ -53,7 +53,6 @@ instruccion : declaracion PYC
             | while_stmt
             | prototipo_funcion PYC
             | funcion
-            | llamada_funcion PYC
             | bloque
             ;
 
@@ -80,7 +79,7 @@ if_stmt : IF PA opal PC instruccion | IF PA opal PC instruccion else_stmt;
 else_stmt : ELSE bloque
           ;
 
-for_stmt : FOR PA asignacion PYC opal PYC asignacion PC instruccion;
+for_stmt : FOR PA asignacion  PYC opal PYC asignacion PC instruccion;
 
 while_stmt : WHILE PA opal PC instruccion ;
 

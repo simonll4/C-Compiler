@@ -31,9 +31,9 @@ class TS():
     def buscarIdGlobal(self, nombreId) -> Contexto:
         a = TS.buscarIdLocal(self, nombreId)
         b = TS.buscarId(self, nombreId)
-        if a :
+        if a:
             return a
-        if b :
+        if b:
             return b
 
     # busca en los contextos anteriores al local, si encuentra ID devuelve contexto en que se encontro

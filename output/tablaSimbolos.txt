@@ -1,4 +1,0 @@
-
-CONTEXTO[1]
-CONTEXTO[0]
-[ID: <class 'tabla_simbolos.ID.Variable'> nombre=x tDato=int inicializado=True accedido=False]

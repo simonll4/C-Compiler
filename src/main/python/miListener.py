@@ -15,71 +15,110 @@ from util.ManejoArchivo import *
 
 class miListener(compiladoresListener):
     tablaSimbolos = TS()
-    # borro todo lo que tenga el archivo en un principio
-    with ManejoArchivo("output/tablaSimbolos.txt") as archivoTS:
+
+    # reiniciar archivo de tabla de simbolos
+    with ManejoArchivo("output/listener/tablaSimbolos.txt") as archivoTS:
         archivoTS.truncate(0)
+    # reiniciar archivo que contiene el informe del listener
+    with ManejoArchivo("output/listener/informeListener.txt") as archivoInforme:
+        archivoInforme.truncate(0)
 
     def enterPrograma(self, ctx: compiladoresParser.ProgramaContext):
-        print("enterPrograma".center(80, "*"))
+        with ManejoArchivo("output/listener/informeListener.txt") as archivoInforme:
+            archivoInforme.write('\n' + f'enterPrograma'.center(40, '*'))
 
     def exitPrograma(self, ctx: compiladoresParser.ProgramaContext):
-        print("exitPrograma".center(80, "*"))
-        with ManejoArchivo("output/tablaSimbolos.txt") as archivoTS:
+        with ManejoArchivo("output/listener/informeListener.txt") as archivoInforme:
+            archivoInforme.write('\n' + f'exitPrograma'.center(40, '*'))
+
+        with ManejoArchivo("output/listener/tablaSimbolos.txt") as archivoTS:
             archivoTS.write(str(self.tablaSimbolos.obtenerUltimoContexto()))
 
     # Enter a parse tree produced by compiladoresParser#bloque.
     def enterBloque(self, ctx: compiladoresParser.BloqueContext):
-        print("enterBloque".center(80, "*"))
+        with ManejoArchivo("output/listener/informeListener.txt") as archivoInforme:
+            archivoInforme.write(
+                '\n' + f'enterBloque (nuevo contexto creado)'.center(40, '*'))
         self.tablaSimbolos.agregarContexto()
 
-    # Exit a parse tree produced by compiladoresParser#bloque.
+        if Util.implFuncion:
+            for identificador in Util.listaArgs:
+                # buscar localmente si existe el ID para declararlo en su contexto
+                # si no existe se agrega a la tabla de simbolos del contexto
+                if self.tablaSimbolos.buscarIdLocal(identificador.nombre):
+                    with ManejoArchivo("output/listener/informeListener.txt") as archivoInforme:
+                        archivoInforme.write(
+                            '\n' + f'NO SE AGREGO EL IDENTIFICADOR {identificador.nombre}'.center(30, '-'))
+                else:
+                    self.tablaSimbolos.agregarId(identificador)
+                    with ManejoArchivo("output/listener/informeListener.txt") as archivoInforme:
+                        archivoInforme.write(
+                            '\n' + f'SE AGREGO NUEVO IDENTIFICADOR {identificador.nombre}'.center(30, '-'))
+
     def exitBloque(self, ctx: compiladoresParser.BloqueContext):
-        print("exitBloque".center(80, "*"))
-        with ManejoArchivo("output/tablaSimbolos.txt") as archivoTS:
+        with ManejoArchivo("output/listener/informeListener.txt") as archivoInforme:
+            archivoInforme.write(
+                '\n' + f'exitBloque(contexto borrado)'.center(40, '*'))
+
+        with ManejoArchivo("output/listener/tablaSimbolos.txt") as archivoTS:
             archivoTS.write(str(self.tablaSimbolos.obtenerUltimoContexto()))
         self.tablaSimbolos.borrarContexto()
 
     def exitDeclaracion(self, ctx: compiladoresParser.DeclaracionContext):
-        print("exitDeclaracion".center(80, "*"))
+        with ManejoArchivo("output/listener/informeListener.txt") as archivoInforme:
+            archivoInforme.write('\n' + f'exitDeclaracion'.center(40, '*'))
 
+        # se guarda tipo de dato
         tDato = str(ctx.getChild(0).getText())
-        datos = ctx.getText()[len(tDato):]
-        listaId = Util.obtenerCantId(datos)
+        # se obtiene lista de los ID declarados
+        # se obitene lista de booleano que indican que id esta inicializado
+        # el orden de las listas es el mismo para las dos
 
-        # agregar ID a la tabla de simbolos
-        for i in listaId:
-            identificador = Variable(i, tDato)
-            if Util.verificarInicializado(datos) == True:
-                identificador.inicializado = True
+        listaId = Util.obtenerIdVariables(ctx.getText()[len(tDato):])
+        listaInicializados = Util.verificarInicializado(
+            ctx.getText()[len(tDato):])
+
+        # agregar obejto ID a la tabla de simbolos
+        for indice, id in enumerate(listaId):
+            identificador = Variable(id, tDato)
+            identificador.inicializado = listaInicializados[indice]
             # buscar localmente si existe el ID para declararlo en su contexto
+            # si no existe se agrega a la tabla de simbolos del contexto
             if self.tablaSimbolos.buscarIdLocal(identificador.nombre):
-                print('NO SE AGREGO NUEVO IDENTIFICADOR'.center(50, '-'))
+                with ManejoArchivo("output/listener/informeListener.txt") as archivoInforme:
+                    archivoInforme.write(
+                        '\n' + f'NO SE AGREGO EL IDENTIFICADOR [{id}]'.center(30, '-'))
             else:
                 self.tablaSimbolos.agregarId(identificador)
-                print('SE AGREGO NUEVO IDENTIFICADOR'.center(50, '-'))
+                with ManejoArchivo("output/listener/informeListener.txt") as archivoInforme:
+                    archivoInforme.write(
+                        '\n' + f'SE AGREGO NUEVO IDENTIFICADOR [{id}]'.center(30, '-'))
 
-    # Exit a parse tree produced by compiladoresParser#asignacion.
     def exitAsignacion(self, ctx: compiladoresParser.AsignacionContext):
-        print("exitAsignacion".center(80, '*'))
-        datos = ctx.getText()
-        listaId = Util.obtenerCantId(datos)
-
+        with ManejoArchivo("output/listener/informeListener.txt") as archivoInforme:
+            archivoInforme.write('\n' + f'exitAsginacion'.center(40, '*'))
+        # se obtiene ID al que se le asigna algo
+        listaId = Util.obtenerIdVariables(ctx.getText())
         # buscar globalmente si esta declarada el ID para asignarle nuevo valor
         for nombreId in listaId:
             contexto = self.tablaSimbolos.buscarIdGlobal(nombreId)
             if contexto:
-                print("EL INDENTIFICADOR SE ENCUENTRA DECLARADO, SE REALIZO LA ASIGNACION".center(
-                    50, '-'))
+                with ManejoArchivo("output/listener/informeListener.txt") as archivoInforme:
+                    archivoInforme.write('\n' + f'NUEVA ASIGNACION A [{nombreId}]'.center(
+                        30, '-'))
+                # buscar el ID en el contexto y poner en True la bandera inicializado
                 for clave in contexto.simbolos:
                     if clave == nombreId:
                         contexto.simbolos[clave].inicializado = True
             else:
-                print("EL INDENTIFICADOR NO SE ENCUENTRA DECLARADO, NO SE REALIZO LA ASIGNACION".center(
-                    50, '-'))
+                with ManejoArchivo("output/listener/informeListener.txt") as archivoInforme:
+                    archivoInforme.write('\n' + f'EL INDENTIFICADOR [{nombreId}] NO SE ENCUENTRA DECLARADO'.center(
+                        50, '-'))
 
-    # Exit a parse tree produced by compiladoresParser#prototipo_funcion.
     def exitPrototipo_funcion(self, ctx: compiladoresParser.Prototipo_funcionContext):
-        print("exitPrototipo_funcion".center(80, '*'))
+        with ManejoArchivo("output/listener/informeListener.txt") as archivoInforme:
+            archivoInforme.write(
+                '\n' + f'exitPrototipo_funcion'.center(40, '*'))
         tDato = str(ctx.getChild(0).getText())
         datos = ctx.getText()[len(tDato):]
         nombre = Util.obtenerNombreFuncion(datos)
@@ -87,36 +126,56 @@ class miListener(compiladoresListener):
         identificador = Funcion(nombre, tDato, listaArs)
 
         if self.tablaSimbolos.buscarIdLocal(identificador.nombre):
-            print('NO SE AGREGO NUEVO IDENTIFICADOR'.center(50, '-'))
+            with ManejoArchivo("output/listener/informeListener.txt") as archivoInforme:
+                archivoInforme.write(
+                    '\n' + f'IDENTIFICADOR [{identificador.nombre}] YA DECLARADO'.center(30, '-'))
         else:
             self.tablaSimbolos.agregarId(identificador)
-            print('SE AGREGO NUEVO IDENTIFICADOR'.center(50, '-'))
+            with ManejoArchivo("output/listener/informeListener.txt") as archivoInforme:
+                archivoInforme.write(
+                    '\n' + f'SE AGREGO IDENTIFICADOR [{nombre}]'.center(30, '-'))
+
+    def enterFuncion(self, ctx: compiladoresParser.FuncionContext):
+        with ManejoArchivo("output/listener/informeListener.txt") as archivoInforme:
+            archivoInforme.write('\n' + f'enterFuncion'.center(40, '*'))
+        Util.implFuncion = True
 
     # Exit a parse tree produced by compiladoresParser#funcion.
     def exitFuncion(self, ctx: compiladoresParser.FuncionContext):
-        print("exitFuncion".center(80, '*'))
+        with ManejoArchivo("output/listener/informeListener.txt") as archivoInforme:
+            archivoInforme.write('\n' + f'exitFuncion'.center(40, '*'))
         tDato = str(ctx.getChild(0).getText())
-        datos = ctx.getText()[len(tDato):]
-        nombre = Util.obtenerNombreFuncion(datos)
-        listaArgs = Util.obtenerArgumentoFuncion(datos)
+        nombre = Util.obtenerNombreFuncion(ctx.getText()[len(tDato):])
+        listaArgs = Util.obtenerArgumentoFuncion(ctx.getText()[len(tDato):])
         identificador = Funcion(nombre, tDato, listaArgs)
+        Util.implFuncion = False
 
         # buscar identifiacor en la tabla de simbolos
         if self.tablaSimbolos.buscarIdGlobal(identificador.nombre):
             # corroborar que la funcion corresponda con el prototipo
             if Util.verificarFuncionPrototipo(identificador):
-                print("LA IMPLEMENTACION CORRESPONDE CON EL PROTOTIPO".center(50, '-'))
+                with ManejoArchivo("output/listener/informeListener.txt") as archivoInforme:
+                    archivoInforme.write(
+                        '\n ' + f'LA IMPLEMENTACION {identificador.nombre} CORRESPONDE CON EL PROTOTIPO'.center(30, '-'))
             else:
-                print(
-                    "LA IMPLEMENTACION NO CORRESPONDE CON EL PROTOTIPO".center(50, '-'))
-        # si no se encuentra en la tabla de simbolos la agrego
+                with ManejoArchivo("output/listener/informeListener.txt") as archivoInforme:
+                    archivoInforme.write(
+                        '\n' + f'LA IMPLEMENTACION {identificador.nombre} NO CORRESPONDE CON EL PROTOTIPO'.center(30, '-'))
+        # si no se encuentra en la tabla de simbolos agrego el identificador de la funcion
         else:
             self.tablaSimbolos.agregarId(identificador)
-            print('SE AGREGO NUEVO IDENTIFICADOR'.center(50, '-'))
+            with ManejoArchivo("output/listener/informeListener.txt") as archivoInforme:
+                archivoInforme.write(
+                    '\n' + f'SE AGREGO EL INDENTIFICADOR [{identificador.nombre}]'.center(30, '-'))
 
-    # Exit a parse tree produced by compiladoresParser#llamada_funcion.
+    def exitArgs_recibido(self, ctx: compiladoresParser.Args_recibidoContext):
+        with ManejoArchivo("output/listener/informeListener.txt") as archivoInforme:
+            archivoInforme.write('\n' + f'exitArgs_recibido'.center(40, '*'))
+        Util.listaArgs = Util.obtenerArgumentoFuncion(ctx.getText())
+
     def exitLlamada_funcion(self, ctx: compiladoresParser.Llamada_funcionContext):
-        print("exitLlamada_funcion".center(50, '*'))
+        with ManejoArchivo("output/listener/informeListener.txt") as archivoInforme:
+            archivoInforme.write('\n' + f'exitLlamada_funcion'.center(40, '*'))
         datos = ctx.getText()
         nombreId = Util.obtenerNombreFuncion(datos)
         parametros = Util.obtenerParametrosFuncion(datos)
@@ -127,20 +186,12 @@ class miListener(compiladoresListener):
         if contextoF:
             # puntero al objeto ID de la funcion
             identificadorF = Util.obtenerId(contextoF, nombreId)
-            print("SE ECUENTRA EL PROTOTIPO DE LA FUNCION".center(50, '-'))
+            with ManejoArchivo("output/listener/informeListener.txt") as archivoInforme:
+                archivoInforme.write(
+                    '\n'+f'SE ECUENTRA DECLARADA LA FUNCION [{nombreId}]'.center(30, '-'))
             # comprobacion de la cantidad de identifcadores en argumento y parametro
-            if Util.verificarCantParametros(identificadorF, parametros):
-                contador = 0
-                for id in parametros:
-                    contextoP = self.tablaSimbolos.buscarIdGlobal(id)
-                    if contextoP:
-                        print("SE ECUENTRA El ID DEL PARAMETRO".center(50, '-'))
-                        identificadorParametro = Util.obtenerId(contextoP, id)
-                        if identificadorParametro.tDato != identificadorF.args[contador].tDato:
-                            print("EL TIPO DE DATO DEL PARAMETRO NO CORRESPONDE CON EL DEL ARGUMENTO DEL PROTOTIPO".center(
-                                50, '-'))
-                        contador += 1
-                    else:
-                        print("NO SE ECUENTRA El ID DEL PARAMETRO".center(50, '-'))
+            Util.verificarParametros(identificadorF, parametros)
         else:
-            print("NO SE ECUENTRA EL PROTOTIPO DE LA FUNCION".center(50, '-'))
+            with ManejoArchivo("output/listener/informeListener.txt") as archivoInforme:
+                archivoInforme.write(
+                    f'LA FUNCION [{nombreId}] NO ESTA DECLARADA'.center(30, '-'))

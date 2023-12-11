@@ -1,0 +1,18 @@
+
+*************enterPrograma**************
+***********exitArgs_recibido************
+*********exitPrototipo_funcion**********
+SE AGREGO IDENTIFICADOR [funcion]
+**************enterFuncion**************
+***********exitArgs_recibido************
+**enterBloque (nuevo contexto creado)***
+************exitDeclaracion*************
+SE AGREGO NUEVO IDENTIFICADOR [x]
+**********exitLlamada_funcion***********
+SE ECUENTRA DECLARADA LA FUNCION [funcion]
+************exitDeclaracion*************
+SE AGREGO NUEVO IDENTIFICADOR [a]
+******exitBloque(contexto borrado)******
+**************exitFuncion***************
+SE AGREGO EL INDENTIFICADOR [main]
+**************exitPrograma**************

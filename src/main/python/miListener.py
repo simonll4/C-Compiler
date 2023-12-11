@@ -94,6 +94,11 @@ class miListener(compiladoresListener):
                     archivoInforme.write(
                         '\n' + f'SE AGREGO NUEVO IDENTIFICADOR [{id}]'.center(30, '-'))
 
+        listaDatos = ctx.getText()[len(tDato):].split(',')
+        for i in range(0,len(listaDatos)):
+            if listaInicializados[i]:
+                Util.verificarAsignacion(listaDatos[i])
+
     def exitAsignacion(self, ctx: compiladoresParser.AsignacionContext):
         with ManejoArchivo("output/listener/informeListener.txt") as archivoInforme:
             archivoInforme.write('\n' + f'exitAsginacion'.center(40, '*'))
@@ -114,6 +119,8 @@ class miListener(compiladoresListener):
                 with ManejoArchivo("output/listener/informeListener.txt") as archivoInforme:
                     archivoInforme.write('\n' + f'EL INDENTIFICADOR [{nombreId}] NO SE ENCUENTRA DECLARADO'.center(
                         50, '-'))
+
+            Util.verificarAsignacion(ctx.getText())
 
     def exitPrototipo_funcion(self, ctx: compiladoresParser.Prototipo_funcionContext):
         with ManejoArchivo("output/listener/informeListener.txt") as archivoInforme:

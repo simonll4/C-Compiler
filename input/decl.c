@@ -1,12 +1,8 @@
 
 
-double funcion(int w);
+double funcion(int x);
 
-int main(){
-    int x = 4;
-
-    int a = funcion(x);
-
+int main()
+{
+    int x = 10;
 }
-
-

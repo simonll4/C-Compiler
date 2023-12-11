@@ -8,10 +8,6 @@ SE AGREGO IDENTIFICADOR [funcion]
 **enterBloque (nuevo contexto creado)***
 ************exitDeclaracion*************
 SE AGREGO NUEVO IDENTIFICADOR [x]
-**********exitLlamada_funcion***********
-SE ECUENTRA DECLARADA LA FUNCION [funcion]
-************exitDeclaracion*************
-SE AGREGO NUEVO IDENTIFICADOR [a]
 ******exitBloque(contexto borrado)******
 **************exitFuncion***************
 SE AGREGO EL INDENTIFICADOR [main]

@@ -1,6 +1,7 @@
 from tabla_simbolos.ID import *
 from tabla_simbolos.TS import *
 from util.ManejoArchivo import *
+import re
 
 
 class Util:
@@ -21,15 +22,40 @@ class Util:
                 lista.append(i)
         return lista
 
-
+    # se encarga de ver que se le asigno a una variable
+    # se fija el tipo de dato de la variable y lo compara
+    # con lo que se le asigna, deben coincidir
     @staticmethod
-    def verificarFuncion(datos):
-        if datos.find('(') > 0 and datos.find(')') > 0:
-            return True
-        return False
+    def verificarAsignacion(datos):
+        aux = datos.split('=')
+        ts = TS()
+        nombreF = None
+        nombreV = aux[0]
+        contextoV = ts.buscarIdGlobal(nombreV)
 
-    # devuelve una lista de booleanos de si esta inicializado o no
-    # las variables pasadas como datos
+        # if aux[1].find('(') > 0 and aux[1].find(')') > 0:
+        funcion = re.compile(r'(\w+)\s*\([^)]*\)')
+        if funcion.match(aux[1]):
+            nombreF = aux[1][:aux[1].find('(')]
+            contextoF = ts.buscarIdGlobal(nombreF)
+            if contextoF.simbolos[nombreF].tDato != contextoV.simbolos[nombreV].tDato:
+                with ManejoArchivo("output/listener/informeListener.txt") as archivoInforme:
+                    archivoInforme.write(
+                        '\n' + f'TIPO DE DATO DE [{nombreV}] DISTINTO DE [{nombreF}]')
+        else:
+            entero = re.compile(r'^[+-]?\d+$')
+            decimal = re.compile(r'^[+-]?\d+\.\d+$')
+            if entero.match(aux[1]):
+                if 'int' != contextoV.simbolos[nombreV].tDato:
+                    with ManejoArchivo("output/listener/informeListener.txt") as archivoInforme:
+                        archivoInforme.write(
+                            '\n' + f'TIPO DE DATO DE [{nombreV}] DISTINTO DE [{aux[1]}]')
+            if decimal.match(aux[1]):
+                if 'double' != contextoV.simbolos[nombreV].tDato:
+                    with ManejoArchivo("output/listener/informeListener.txt") as archivoInforme:
+                        archivoInforme.write(
+                            '\n' + f'TIPO DE DATO DE [{nombreV}] DISTINTO DE [{aux[1]}]')
+
     @staticmethod
     def verificarInicializado(datos) -> list:
         identificadores = datos.split(',')

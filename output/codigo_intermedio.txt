@@ -1,13 +1,8 @@
 
-pop w
+pop x
 label l1 
 pop l0 
-t0  = 4
+t0  = 10
 x = t0
-push x
-push l2 
-jmp l3 
-label l2 
-a = t0
 push t0
 jmp l0 

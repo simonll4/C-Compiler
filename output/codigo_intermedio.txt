@@ -1,8 +1,0 @@
-
-pop x
-label l1 
-pop l0 
-t0  = 10
-x = t0
-push t0
-jmp l0 

@@ -42,6 +42,7 @@ class miListener(compiladoresListener):
         self.tablaSimbolos.agregarContexto()
 
         if Util.implFuncion:
+            Util.implFuncion = False
             for identificador in Util.listaArgs:
                 # buscar localmente si existe el ID para declararlo en su contexto
                 # si no existe se agrega a la tabla de simbolos del contexto
@@ -95,7 +96,7 @@ class miListener(compiladoresListener):
                         '\n' + f'SE AGREGO NUEVO IDENTIFICADOR [{id}]'.center(30, '-'))
 
         listaDatos = ctx.getText()[len(tDato):].split(',')
-        for i in range(0,len(listaDatos)):
+        for i in range(0, len(listaDatos)):
             if listaInicializados[i]:
                 Util.verificarAsignacion(listaDatos[i])
 
@@ -174,6 +175,8 @@ class miListener(compiladoresListener):
             with ManejoArchivo("output/listener/informeListener.txt") as archivoInforme:
                 archivoInforme.write(
                     '\n' + f'SE AGREGO EL INDENTIFICADOR [{identificador.nombre}]'.center(30, '-'))
+        if nombre == 'main':
+            identificador.accedido = True
 
     def exitArgs_recibido(self, ctx: compiladoresParser.Args_recibidoContext):
         with ManejoArchivo("output/listener/informeListener.txt") as archivoInforme:
@@ -198,7 +201,11 @@ class miListener(compiladoresListener):
                     '\n'+f'SE ECUENTRA DECLARADA LA FUNCION [{nombreId}]'.center(30, '-'))
             # comprobacion de la cantidad de identifcadores en argumento y parametro
             Util.verificarParametros(identificadorF, parametros)
+            contextoF.simbolos[nombreId].accedido = True
         else:
             with ManejoArchivo("output/listener/informeListener.txt") as archivoInforme:
                 archivoInforme.write(
                     f'LA FUNCION [{nombreId}] NO ESTA DECLARADA'.center(30, '-'))
+
+    def exitOpal(self, ctx: compiladoresParser.OpalContext):
+        Util.verificarAccedido(ctx.getText())

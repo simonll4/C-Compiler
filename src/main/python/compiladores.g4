@@ -1,5 +1,6 @@
 grammar compiladores;
 
+
 fragment LETRA : [A-Za-z] ;
 fragment DIGITO : [0-9] ;
 
@@ -27,6 +28,9 @@ MODULO : '%';
 
 INT : 'int';
 DOUBLE:'double' ;
+VOID: 'void';
+
+MAIN: 'main';
 
 WHILE : 'while' ;
 FOR : 'for';
@@ -34,7 +38,7 @@ IF : 'if';
 ELSE : 'else';
 RETORNO : 'return';
 
-NUMERO : DIGITO+ ;
+NUMERO : DIGITO+ ('.' DIGITO*)? ;
 ID : (LETRA | '_')(LETRA | DIGITO | '_')* ;
 WS : [ \t\r\n] -> skip ;
 OTRO : . ;
@@ -122,7 +126,8 @@ factor : ID
 
 prototipo_funcion : tipo_dato ID PA args_recibido PC;
 
-funcion : tipo_dato ID PA args_recibido PC bloque ;
+funcion : tipo_dato ID PA args_recibido PC bloque 
+         | VOID MAIN PA args_recibido PC bloque ;
 
 args_recibido : tipo_dato ID lista_args_recibido
               |;

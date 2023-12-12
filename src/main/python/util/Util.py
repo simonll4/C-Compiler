@@ -13,8 +13,10 @@ class Util:
     @staticmethod
     def obtenerIdVariables(datos):
         lista = []
-        identifacadores = datos.split(',')
-        for i in identifacadores:
+        expresion_regular = r',(?![^()]*\))'
+        # identifacadores = datos[:].split(',') ver aca problema con la coma de funcion(a,b)
+        identificadores = re.split(expresion_regular, datos)
+        for i in identificadores:
             asignacion = i.find('=')
             if asignacion > 0:
                 lista.append(i[:asignacion])
@@ -35,6 +37,10 @@ class Util:
 
         # if aux[1].find('(') > 0 and aux[1].find(')') > 0:
         funcion = re.compile(r'(\w+)\s*\([^)]*\)')
+        entero = re.compile(r'^[+-]?\d+$')
+        decimal = re.compile(r'^[+-]?\d+\.\d+$')
+        variables = re.compile(r'^[a-zA-Z]|[a-zA-Z0-9_]+$')
+
         if funcion.match(aux[1]):
             nombreF = aux[1][:aux[1].find('(')]
             contextoF = ts.buscarIdGlobal(nombreF)
@@ -43,18 +49,26 @@ class Util:
                     archivoInforme.write(
                         '\n' + f'TIPO DE DATO DE [{nombreV}] DISTINTO DE [{nombreF}]')
         else:
-            entero = re.compile(r'^[+-]?\d+$')
-            decimal = re.compile(r'^[+-]?\d+\.\d+$')
-            if entero.match(aux[1]):
-                if 'int' != contextoV.simbolos[nombreV].tDato:
-                    with ManejoArchivo("output/listener/informeListener.txt") as archivoInforme:
-                        archivoInforme.write(
-                            '\n' + f'TIPO DE DATO DE [{nombreV}] DISTINTO DE [{aux[1]}]')
-            if decimal.match(aux[1]):
-                if 'double' != contextoV.simbolos[nombreV].tDato:
-                    with ManejoArchivo("output/listener/informeListener.txt") as archivoInforme:
-                        archivoInforme.write(
-                            '\n' + f'TIPO DE DATO DE [{nombreV}] DISTINTO DE [{aux[1]}]')
+            expresion_regular = r'\b(?:\d+\.\d+|\d+|[a-zA-Z]+(?:_[a-zA-Z0-9]+)?)\b'
+            listaV = re.findall(expresion_regular, aux[1])
+
+            for i in listaV:
+                if entero.match(i):
+                    if 'int' != contextoV.simbolos[nombreV].tDato:
+                        with ManejoArchivo("output/listener/informeListener.txt") as archivoInforme:
+                            archivoInforme.write(
+                                '\n' + f'TIPO DE DATO DE [{nombreV}] DISTINTO DE [{i}]')
+                elif decimal.match(i):
+                    if 'double' != contextoV.simbolos[nombreV].tDato:
+                        with ManejoArchivo("output/listener/informeListener.txt") as archivoInforme:
+                            archivoInforme.write(
+                                '\n' + f'TIPO DE DATO DE [{nombreV}] DISTINTO DE [{i}]')
+                elif variables.match(i):
+                    contexto = ts.buscarIdGlobal(i)
+                    if contexto.simbolos[i].tDato != contextoV.simbolos[nombreV].tDato:
+                        with ManejoArchivo("output/listener/informeListener.txt") as archivoInforme:
+                            archivoInforme.write(
+                                '\n' + f'TIPO DE DATO DE [{nombreV}] DISTINTO DE [{i}]')
 
     @staticmethod
     def verificarInicializado(datos) -> list:
@@ -94,7 +108,9 @@ class Util:
                 tDato = 'double'
                 listaArgumentos.append(Variable(nombre, tDato))
             elif i == '':
-                print("LISTA DE ARGUMENTOS DE LA FUNCION VACIA".center(50, '-'))
+                with ManejoArchivo("output/listener/informeListener.txt") as archivoInforme:
+                    archivoInforme.write(
+                        '\n' + f'LISTA DE ARGUMENTOS DE LA FUNCION VACIA'.center(50, '-'))
         return listaArgumentos
 
     # devuelve lista de parametros que se le pasan a la funcion
@@ -133,7 +149,7 @@ class Util:
     # devuelve el obejto ID dentro del diccionario(tabla simbolos) que pertenece al contexto
     @staticmethod
     def obtenerId(contexto, parametro) -> ID:
-        for clave, valor in contexto.simbolos.items():
+        for clave, valor in contexto. simbolos.items():
             if clave == parametro:
                 return valor
 
@@ -167,7 +183,19 @@ class Util:
                 return False
         return True
 
+    @staticmethod
+    def verificarAccedido(datos):
+        ts = TS()
+        expresion = r'\b[a-zA-Z][a-zA-Z0-9_]*\b'
+        lista = re.findall(expresion, datos)
 
+        for i in lista:
+            contexto = ts.buscarIdGlobal(i)
+            if contexto:
+                Util.obtenerId(contexto, i).accedido = True
+
+
+# PRUEBAS
 if __name__ == "__main__":
     lista = Util.obtenerParametrosFuncion("hola(x,y)")
     print(lista)

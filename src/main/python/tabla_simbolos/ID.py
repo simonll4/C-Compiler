@@ -45,7 +45,7 @@ class ID(ABC):
         self._inicializado = flag
 
     @accedido.setter
-    def accedidoTrue(self, flag):
+    def accedido(self, flag):
         self._accedido = flag
 
 

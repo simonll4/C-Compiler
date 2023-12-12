@@ -1,8 +1,6 @@
 
 
-double funcion(int x);
+int a = 10;
+int c = 20;
 
-int main()
-{
-    int x = 10;
-}
+c = a + 1 + c;

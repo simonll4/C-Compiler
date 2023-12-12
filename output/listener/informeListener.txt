@@ -1,9 +1,7 @@
 
 *************enterPrograma**************
 ************exitDeclaracion*************
-SE AGREGO NUEVO IDENTIFICADOR [a]
+SE AGREGO NUEVO IDENTIFICADOR [b]
 ************exitDeclaracion*************
-SE AGREGO NUEVO IDENTIFICADOR [c]
-*************exitAsginacion*************
-----NUEVA ASIGNACION A [c]----
+SE AGREGO NUEVO IDENTIFICADOR [a]
 **************exitPrograma**************

@@ -1,4 +1,4 @@
 
 CONTEXTO[0]
-[ID: <class 'tabla_simbolos.ID.Variable'> nombre=a tDato=int inicializado=True accedido=True]
-[ID: <class 'tabla_simbolos.ID.Variable'> nombre=c tDato=int inicializado=True accedido=True]
+[ID: <class 'tabla_simbolos.ID.Variable'> nombre=b tDato=int inicializado=True accedido=True]
+[ID: <class 'tabla_simbolos.ID.Variable'> nombre=a tDato=int inicializado=True accedido=False]

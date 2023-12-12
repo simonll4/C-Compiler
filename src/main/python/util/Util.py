@@ -193,10 +193,3 @@ class Util:
             contexto = ts.buscarIdGlobal(i)
             if contexto:
                 Util.obtenerId(contexto, i).accedido = True
-
-
-# PRUEBAS
-if __name__ == "__main__":
-    lista = Util.obtenerParametrosFuncion("hola(x,y)")
-    print(lista)
-    # print(lista[1])

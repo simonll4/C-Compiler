@@ -1,3 +1,6 @@
-t4 = 2
-t5 = 1 + t4
-a = t5
+
+labelmain
+labell0
+ifnot 1 jmp l1
+t3 = x + 1
+x = t3

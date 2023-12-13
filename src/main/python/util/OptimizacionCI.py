@@ -1,21 +1,9 @@
 from ManejoArchivo import ManejoArchivo
+from Cte import Cte
 import re
 
-# expresiones regulares
-temporal = re.compile(r'\bt\d+\b')
-entero = re.compile(r'^[+-]?\d+$')
-decimal = re.compile(r'^[+-]?\d+\.\d+$')
-asignacion = re.compile(r'[a-zA-Z]=\d+(\.\d+)?|[a-zA-Z]=[a-zA-Z]')
-tNumeroLetra = re.compile(r't\d+=(\d+(\.\d+)?|[a-zA-Z])')
-tLetra = re.compile(r'[a-zA-Z]\s*=\s*t\d+\s*(?:\n|$)')
-opal = re.compile(
-    r'\s*(?:[+\-*/%]|&&|\|\||[<>]=?|!=|==)\s*|\b(?:t\d+|[a-zA-Z]+|\d+(\.\d+)?)\b')
-simbolos = r'[+\-*/%<>!=]|&&|\|\||=='
-listaSimbolos = ['+', '-', '*', '/', '&&', '||', '<=', '>=', '!=', '==', '%']
-
 temporales = {}
-
-cantidadArchivos = 6;
+cantidadArchivos = 3
 
 
 def sacarEspacios(datos):
@@ -31,22 +19,35 @@ def sacarSaltoLinea(datos):
 def optimizador(linea, index=0):
     with ManejoArchivo(f'output/visitor/pasadas_optimizacion/codigo_intermedio_optimizado{index}.txt') as CI:
         linea = sacarSaltoLinea(linea)
+        linea1 = linea
         linea = sacarEspacios(linea)
 
+        if Cte.etiqueta.match(linea) or Cte.jmpFuncion.match(linea) or sacarEspacios(linea) == 'endmain':
+            CI.write(f'\n{linea}')
+
+        elif Cte.pilaFuncion.match(linea):
+            match = re.match(r'^(push|pop)([a-zA-Z]|l\d+|t\d+|\d+)$', linea)
+            aux = [match.group(1), match.group(2)]
+            if aux[1] in temporales:
+                CI.write(f'\n{aux[0]} {temporales[aux[1]]}')
+            else:
+                CI.write(f'\n{linea}')
+
         # letra = numero
-        if asignacion.match(linea) and linea.find('t') < 0:
-            coincidencia = linea.split('=')
-            temporales[coincidencia[0]] = coincidencia[1]
-        
+        elif Cte.asignacion.match(linea) and linea.find('t') < 0:
+            aux = linea.split('=')
+            if Cte.variables.match(aux[1]) and aux[1] in temporales:
+                CI.write('\n' + f'{aux[0]} = {temporales[aux[1]]}')
+            temporales[aux[0]] = aux[1]
 
         # se guardan los tn = (numero o letra) en un diccionario
-        # tn = numero o tn = letra
-        elif tNumeroLetra.match(linea) and not (any(simbolo in linea for simbolo in listaSimbolos)):
+        # tn = numero o tn = letra o tn = booleano
+        elif (Cte.tNumeroLetra.match(linea) and not (any(simbolo in linea for simbolo in Cte.listaSimbolos)) or Cte.booleano.match(linea)):
             coincidencia = linea.split('=')
             temporales[coincidencia[0]] = coincidencia[1]
         # se verifica letras = tn y se reemplaza por el valor de tn
         # letra = tn
-        elif tLetra.match(linea):
+        elif Cte.tLetra.match(linea):
             aux = linea.split('=')
             if aux[1] in temporales:
                 aux2 = temporales[aux[1]]
@@ -54,23 +55,25 @@ def optimizador(linea, index=0):
             else:
                 CI.write('\n' + f'{aux[0]} = {aux[1]}')
         #
-        elif opal.match(linea):
+        elif Cte.opal.match(linea) and any(simbolo in linea for simbolo in Cte.listaSimbolos):
             aux = linea.split('=')
-            simbolo = re.findall(simbolos, linea)
-            elementos = re.split(simbolos, aux[1])
-
-            if bool(entero.match(elementos[0])) == True and bool(entero.match(elementos[1])) == True:
-                aux1 = int(elementos[0]) + int(elementos[1])
-                CI.write(f'{aux[0]} {simbolo[0]} {aux1}')
+            simbolo = re.findall(Cte.simbolos, linea)
+            elementos = re.split(Cte.simbolos, aux[1])
+            # verifica su los 2 terminos son enteros para sumarlos
+            if bool(Cte.entero.match(elementos[0])) == True and bool(Cte.entero.match(elementos[1])) == True:
+                CI.write(f'\n{aux[0]} {simbolo[0]} {eval(aux[1])}')
             else:
-                if bool(decimal.match(elementos[0])) == True and bool(decimal.match(elementos[1])) == True:
+                # verifica su los 2 terminos son decimales para sumarlos
+                if bool(Cte.decimal.match(elementos[0])) == True and bool(Cte.decimal.match(elementos[1])) == True:
                     aux1 = float(elementos[0]) + float(elementos[1])
-                    CI.write(f'{aux[0]} {simbolo[0]} {aux1}')
+                    CI.write(f'\n{aux[0]} {simbolo[0]} {aux[1]}')
                 else:
-                    if bool(temporal.match(elementos[0])):
+                    if bool(Cte.temporal.match(elementos[0])):
                         if elementos[0] in temporales:
-                            aux1 = temporales[elementos[0]]
-                            CI.write('\n' + f'{aux[0]} {simbolo[0]} {aux1}')
+                            CI.write('\n' + f'{aux[0]} {simbolo[0]} {temporales[elementos[0]]}')
+                        else:
+                            CI.write(
+                                '\n' + f'{aux[0]} {simbolo[0]} {elementos[0]}')
                     else:
                         CI.write(
                             '\n' + f'{aux[0]} {simbolo[0]} {elementos[0]}')
@@ -79,11 +82,23 @@ def optimizador(linea, index=0):
                             aux1 = temporales[elementos[1]]
                             CI.write(f' {simbolo[1]} {aux1}')
                     else:
+                        # temporales[aux[0]] = aux[1]
                         CI.write(f' {simbolo[1]} {elementos[1]}')
+        elif Cte.ifNot.match(linea1):
+            # se obtiene el argumento del ifnot aux[0] y del jmp aux[1]
+            aux = re.findall(Cte.ifNotDivision, linea1)
+            aux1 = [match for match in aux[0]]
+            if aux1[0] in temporales:
+                CI.write(f'\nifnot {temporales[aux1[0]]}')
+            else:
+                CI.write(f'\nifnot {aux1[0]}')
+            if aux1[1] in temporales:
+                CI.write(f' jmp {temporales[aux1[1]]}')
+            else:
+                CI.write(f' jmp {aux1[1]}')
 
 
 cant = list(range(0, cantidadArchivos))
-
 
 for i in cant:
     with ManejoArchivo(f'output/visitor/pasadas_optimizacion/codigo_intermedio_optimizado{i}.txt') as CI:
@@ -102,3 +117,8 @@ for i in cant[1:]:
     optimizado.close()
     for linea in lineas:
         optimizador(linea, i)
+
+
+if __name__ == '__main__':
+    # print(eval('True && False'))
+    print('')

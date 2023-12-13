@@ -1,9 +1,12 @@
 
-t0  = 0
-b = t0
-t1  = 1
-t2  = 2
-t3  = b
-t4  = t2 + t3
-t5  = t1 + t4
-a = t5
+label main
+label l0 
+t0  = 1
+ifnot t0 jmp l1 
+t1  = x
+t2  = 1
+t3  = t1 + t2
+x = t3
+jmp l0
+label l1
+end main

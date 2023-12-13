@@ -49,12 +49,13 @@ class miListener(compiladoresListener):
                 if self.tablaSimbolos.buscarIdLocal(identificador.nombre):
                     with ManejoArchivo("output/listener/informeListener.txt") as archivoInforme:
                         archivoInforme.write(
-                            '\n' + f'NO SE AGREGO EL IDENTIFICADOR {identificador.nombre}'.center(30, '-'))
+                            '\n' + f'NO SE AGREGO EL IDENTIFICADOR [{identificador.nombre}]'.center(30, '-'))
+                        Util.Error = True
                 else:
                     self.tablaSimbolos.agregarId(identificador)
                     with ManejoArchivo("output/listener/informeListener.txt") as archivoInforme:
                         archivoInforme.write(
-                            '\n' + f'SE AGREGO NUEVO IDENTIFICADOR {identificador.nombre}'.center(30, '-'))
+                            '\n' + f'SE AGREGO NUEVO IDENTIFICADOR [{identificador.nombre}]'.center(30, '-'))
 
     def exitBloque(self, ctx: compiladoresParser.BloqueContext):
         with ManejoArchivo("output/listener/informeListener.txt") as archivoInforme:
@@ -89,6 +90,7 @@ class miListener(compiladoresListener):
                 with ManejoArchivo("output/listener/informeListener.txt") as archivoInforme:
                     archivoInforme.write(
                         '\n' + f'NO SE AGREGO EL IDENTIFICADOR [{id}]'.center(30, '-'))
+                    Util.Error = True
             else:
                 self.tablaSimbolos.agregarId(identificador)
                 with ManejoArchivo("output/listener/informeListener.txt") as archivoInforme:
@@ -120,6 +122,7 @@ class miListener(compiladoresListener):
                 with ManejoArchivo("output/listener/informeListener.txt") as archivoInforme:
                     archivoInforme.write('\n' + f'EL INDENTIFICADOR [{nombreId}] NO SE ENCUENTRA DECLARADO'.center(
                         50, '-'))
+                    Util.Error = True
 
             Util.verificarAsignacion(ctx.getText())
 
@@ -137,6 +140,7 @@ class miListener(compiladoresListener):
             with ManejoArchivo("output/listener/informeListener.txt") as archivoInforme:
                 archivoInforme.write(
                     '\n' + f'IDENTIFICADOR [{identificador.nombre}] YA DECLARADO'.center(30, '-'))
+                Util.Error = True
         else:
             self.tablaSimbolos.agregarId(identificador)
             with ManejoArchivo("output/listener/informeListener.txt") as archivoInforme:
@@ -169,6 +173,7 @@ class miListener(compiladoresListener):
                 with ManejoArchivo("output/listener/informeListener.txt") as archivoInforme:
                     archivoInforme.write(
                         '\n' + f'LA IMPLEMENTACION {identificador.nombre} NO CORRESPONDE CON EL PROTOTIPO'.center(30, '-'))
+                    Util.Error = True
         # si no se encuentra en la tabla de simbolos agrego el identificador de la funcion
         else:
             self.tablaSimbolos.agregarId(identificador)
@@ -206,6 +211,7 @@ class miListener(compiladoresListener):
             with ManejoArchivo("output/listener/informeListener.txt") as archivoInforme:
                 archivoInforme.write(
                     f'LA FUNCION [{nombreId}] NO ESTA DECLARADA'.center(30, '-'))
+                Util.Error = True
 
     def exitOpal(self, ctx: compiladoresParser.OpalContext):
         Util.verificarAccedido(ctx.getText())

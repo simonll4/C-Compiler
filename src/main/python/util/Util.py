@@ -7,6 +7,7 @@ import re
 class Util:
     listaArgs = []
     implFuncion = False
+    Error = False
 
     # verifica: una variable (a) o varias separadas por comas (a,b,c)
     # devuelve los identificadores en forma de lista
@@ -58,17 +59,20 @@ class Util:
                         with ManejoArchivo("output/listener/informeListener.txt") as archivoInforme:
                             archivoInforme.write(
                                 '\n' + f'TIPO DE DATO DE [{nombreV}] DISTINTO DE [{i}]')
+                            Util.Error = True
                 elif decimal.match(i):
                     if 'double' != contextoV.simbolos[nombreV].tDato:
                         with ManejoArchivo("output/listener/informeListener.txt") as archivoInforme:
                             archivoInforme.write(
                                 '\n' + f'TIPO DE DATO DE [{nombreV}] DISTINTO DE [{i}]')
+                            Util.Error = True
                 elif variables.match(i):
                     contexto = ts.buscarIdGlobal(i)
                     if contexto.simbolos[i].tDato != contextoV.simbolos[nombreV].tDato:
                         with ManejoArchivo("output/listener/informeListener.txt") as archivoInforme:
                             archivoInforme.write(
                                 '\n' + f'TIPO DE DATO DE [{nombreV}] DISTINTO DE [{i}]')
+                            Util.Error = True
 
     @staticmethod
     def verificarInicializado(datos) -> list:
@@ -107,7 +111,7 @@ class Util:
                 nombre = i[6:]
                 tDato = 'double'
                 listaArgumentos.append(Variable(nombre, tDato))
-            elif i == '':
+            elif i == '' and Util.implFuncion == True:
                 with ManejoArchivo("output/listener/informeListener.txt") as archivoInforme:
                     archivoInforme.write(
                         '\n' + f'LISTA DE ARGUMENTOS DE LA FUNCION VACIA'.center(50, '-'))
@@ -136,6 +140,7 @@ class Util:
             with ManejoArchivo("output/listener/informeListener.txt") as archivoInforme:
                 archivoInforme.write(
                     '\n' + f'TIPO DE DATO RETORNO [{indentificador.tDato}] INCORRECTO'.center(30, '-'))
+                Util.Error = True
             return False
         # verificacion de los tipos de datos del argumento
         for i in range(0, len(id.args)):
@@ -143,6 +148,7 @@ class Util:
                 with ManejoArchivo("output/listener/informeListener.txt") as archivoInforme:
                     archivoInforme.write(
                         '\n' + f'TIPO DE DATO INCORRECTO PARAMETRO [{i}] DEL ARGUMENTO')
+                    Util.Error = True
                 return False
         return True
 
@@ -175,11 +181,13 @@ class Util:
                     with ManejoArchivo("output/listener/informeListener.txt") as archivoInforme:
                         archivoInforme.write(
                             '\n' + f'TIPO DE DATO INCORRECTO PARAMETRO [{i}] DEL ARGUMENTO')
+                        Util.Error = True
                     return False
         else:
             with ManejoArchivo("output/listener/informeListener.txt") as archivoInforme:
                 archivoInforme.write(
                     '\n' + f'CANTIDAD INVALIDA DE PARAMETROS DE LA FUNCION [{identificadorF.nombre}] ')
+                Util.Error = True
                 return False
         return True
 

@@ -1,7 +1,16 @@
 
 *************enterPrograma**************
+**************enterFuncion**************
+***********exitArgs_recibido************
+-----LISTA DE ARGUMENTOS DE LA FUNCION VACIA------
+**enterBloque (nuevo contexto creado)***
 ************exitDeclaracion*************
-SE AGREGO NUEVO IDENTIFICADOR [b]
-************exitDeclaracion*************
-SE AGREGO NUEVO IDENTIFICADOR [a]
+SE AGREGO NUEVO IDENTIFICADOR [x]
+**enterBloque (nuevo contexto creado)***
+*************exitAsginacion*************
+----NUEVA ASIGNACION A [x]----
+******exitBloque(contexto borrado)******
+******exitBloque(contexto borrado)******
+**************exitFuncion***************
+SE AGREGO EL INDENTIFICADOR [main]
 **************exitPrograma**************

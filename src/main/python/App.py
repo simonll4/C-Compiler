@@ -4,6 +4,7 @@ from compiladoresLexer import compiladoresLexer
 from compiladoresParser import compiladoresParser
 from miListener import miListener
 from miVisitor import miVisitor
+from util.Util import Util
 
 
 def main(argv):
@@ -14,12 +15,16 @@ def main(argv):
     lexer = compiladoresLexer(input)
     stream = CommonTokenStream(lexer)
     parser = compiladoresParser(stream)
+    # print(tree.toStringTree(recog=parser))
     listener = miListener()
     parser.addParseListener(listener)
     tree = parser.programa()
-    # print(tree.toStringTree(recog=parser))
-    visitante = miVisitor()
-    visitante.visit(tree)
+
+    if Util.Error != True:
+        visitante = miVisitor()
+        visitante.visit(tree)
+    else:
+        print(f'ERROR DE COMPILACION'.center(40, '-'))
 
 
 if __name__ == '__main__':

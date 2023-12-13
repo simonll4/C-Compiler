@@ -1,3 +1,12 @@
 
-int b =0;
-int a = 1 + 2 + b;
+
+void main()
+{
+
+    int x;
+
+    while (1)
+    {
+        x = x + 1;
+    }
+}

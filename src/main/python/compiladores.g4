@@ -31,7 +31,6 @@ DOUBLE:'double' ;
 VOID: 'void';
 
 MAIN: 'main';
-
 WHILE : 'while' ;
 FOR : 'for';
 IF : 'if';

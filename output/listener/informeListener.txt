@@ -9,12 +9,15 @@ SE AGREGO IDENTIFICADOR [suma]
 **enterBloque (nuevo contexto creado)***
 ************exitDeclaracion*************
 SE AGREGO NUEVO IDENTIFICADOR [a]
+TIPO DE DATO DE [a] DISTINTO DE [10]
 ************exitDeclaracion*************
 SE AGREGO NUEVO IDENTIFICADOR [b]
 **********exitLlamada_funcion***********
 SE ECUENTRA DECLARADA LA FUNCION [suma]
+TIPO DE DATO INCORRECTO PARAMETRO [0] DEL ARGUMENTO
 ************exitDeclaracion*************
 SE AGREGO NUEVO IDENTIFICADOR [c]
+TIPO DE DATO DE [c] DISTINTO DE [a]
 ******exitBloque(contexto borrado)******
 **************exitFuncion***************
 SE AGREGO EL INDENTIFICADOR [main]

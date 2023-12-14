@@ -1,6 +1,14 @@
 
-labelmain
-labell0
-ifnot 1 jmp l1
-t3 = x + 1
-x = t3
+label main
+push 10
+push 20
+push l0 
+jmp suma
+label l0 
+end main
+label suma
+pop a
+pop b
+pop l0 
+push a+b
+jmp l0 

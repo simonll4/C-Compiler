@@ -68,11 +68,18 @@ class Util:
                             Util.Error = True
                 elif variables.match(i):
                     contexto = ts.buscarIdGlobal(i)
+                    #identificador = Util.obtenerId(contexto,i)
+                    #if identificador:
                     if contexto.simbolos[i].tDato != contextoV.simbolos[nombreV].tDato:
                         with ManejoArchivo("output/listener/informeListener.txt") as archivoInforme:
                             archivoInforme.write(
                                 '\n' + f'TIPO DE DATO DE [{nombreV}] DISTINTO DE [{i}]')
                             Util.Error = True
+                    # else:
+                    #     with ManejoArchivo("output/listener/informeListener.txt") as archivoInforme:
+                    #             archivoInforme.write(
+                    #                 '\n' + f'IDENTIFICADOR [{i}] NO DECLARADO')
+                    #             Util.Error = True
 
     @staticmethod
     def verificarInicializado(datos) -> list:

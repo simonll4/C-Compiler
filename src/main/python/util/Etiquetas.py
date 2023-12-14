@@ -55,6 +55,6 @@ class Etiquetas:
         # tengo que crear las dos etiquetas
         lista = []
         lista.append(Etiquetas.l(self))  # agrego la primer etiqueta
-        lista.append(Etiquetas.l(self))  # agrego la segunda etiqueta
+        lista.append(identificador)  # agrego la segunda etiqueta
         Etiquetas._lblFuncion[str(identificador)] = lista
         return lista

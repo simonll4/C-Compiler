@@ -1,16 +1,29 @@
 
 *************enterPrograma**************
+***********exitArgs_recibido************
+*********exitPrototipo_funcion**********
+SE AGREGO IDENTIFICADOR [suma]
 **************enterFuncion**************
 ***********exitArgs_recibido************
 -----LISTA DE ARGUMENTOS DE LA FUNCION VACIA------
 **enterBloque (nuevo contexto creado)***
 ************exitDeclaracion*************
-SE AGREGO NUEVO IDENTIFICADOR [x]
-**enterBloque (nuevo contexto creado)***
-*************exitAsginacion*************
-----NUEVA ASIGNACION A [x]----
-******exitBloque(contexto borrado)******
+SE AGREGO NUEVO IDENTIFICADOR [a]
+************exitDeclaracion*************
+SE AGREGO NUEVO IDENTIFICADOR [b]
+**********exitLlamada_funcion***********
+SE ECUENTRA DECLARADA LA FUNCION [suma]
+************exitDeclaracion*************
+SE AGREGO NUEVO IDENTIFICADOR [c]
 ******exitBloque(contexto borrado)******
 **************exitFuncion***************
 SE AGREGO EL INDENTIFICADOR [main]
+**************enterFuncion**************
+***********exitArgs_recibido************
+**enterBloque (nuevo contexto creado)***
+SE AGREGO NUEVO IDENTIFICADOR [a]
+SE AGREGO NUEVO IDENTIFICADOR [b]
+******exitBloque(contexto borrado)******
+**************exitFuncion***************
+ LA IMPLEMENTACION suma CORRESPONDE CON EL PROTOTIPO
 **************exitPrograma**************

@@ -199,7 +199,7 @@ class miVisitor(compiladoresVisitor):
         if ctx.getChild(1).getText() != 'main':
             listaEtiquetas = self.tmp.lFuncion(ctx.getChild(1).getText())
             with ManejoArchivo("output/visitor/codigo_intermedio.txt") as archivoCI:
-                archivoCI.write(f'\nlabel {listaEtiquetas[1]}')
+                archivoCI.write(f'\nlabel {ctx.getChild(1)}')
         # verifica si hay parametros dentro del argumento de la funcion
         # push de los parametros pasados como argumento a la funcion
         if ctx.getChild(3).getText() != '':

@@ -146,6 +146,7 @@ class miListener(compiladoresListener):
             with ManejoArchivo("output/listener/informeListener.txt") as archivoInforme:
                 archivoInforme.write(
                     '\n' + f'SE AGREGO IDENTIFICADOR [{nombre}]'.center(30, '-'))
+                identificador.inicializado = True
 
     def enterFuncion(self, ctx: compiladoresParser.FuncionContext):
         with ManejoArchivo("output/listener/informeListener.txt") as archivoInforme:

@@ -5,6 +5,7 @@ from compiladoresParser import compiladoresParser
 from miListener import miListener
 from miVisitor import miVisitor
 from util.Util import Util
+from OptimizacionCI import OptimizacionCI
 import re
 
 
@@ -17,7 +18,6 @@ def main(argv):
     stream = CommonTokenStream(lexer)
     parser = compiladoresParser(stream)
     # print(tree.toStringTree(recog=parser))
-
     listener = miListener()
     parser.addParseListener(listener)
     tree = parser.programa()
@@ -32,6 +32,7 @@ def main(argv):
     if Util.Error != True and len(resultados) == 0:
         visitante = miVisitor()
         visitante.visit(tree)
+        OptimizacionCI.iniciarOptimizacion()
     elif Util.Error == True:
         print(f'ERROR SEMANTICO (ver informe listener)'.center(40, '-'))
     elif len(resultados) > 0:

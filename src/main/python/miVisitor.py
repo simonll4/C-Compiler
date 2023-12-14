@@ -12,29 +12,29 @@ class miVisitor(compiladoresVisitor):
         archivoCI.truncate(0)
 
     def visitPrograma(self, ctx: compiladoresParser.ProgramaContext):
-        print("visitPrograma".center(50, '*'))
+        #print("visitPrograma".center(50, '*'))
         return self.visitChildren(ctx)
 
     def visitInstrucciones(self, ctx: compiladoresParser.InstruccionesContext):
-        print("visitInstrucciones".center(50, '*'))
+        #print("visitInstrucciones".center(50, '*'))
         return self.visitChildren(ctx)
 
     def visitInstruccion(self, ctx: compiladoresParser.InstruccionContext):
-        print("visitInstruccion".center(50, '*'))
+        #print("visitInstruccion".center(50, '*'))
         return self.visitChildren(ctx)
 
     def visitRetornar(self, ctx: compiladoresParser.RetornarContext):
-        print("visitRetonar".center(50, '*'))
+        #print("visitRetonar".center(50, '*'))
         if self.funcion:
             return self.visitOpal(ctx.getChild(2))
         return self.visitChildren(ctx)
 
     def visitBloque(self, ctx: compiladoresParser.BloqueContext):
-        print("visitBloque".center(50, '*'))
+        #print("visitBloque".center(50, '*'))
         return self.visitInstrucciones(ctx.getChild(1))
 
     def visitDeclaracion(self, ctx: compiladoresParser.DeclaracionContext):
-        print("visitDeclaracion".center(50, '*'))
+        #print("visitDeclaracion".center(50, '*'))
 
         # verificacion de si en la declaracion se asigna algun valor al ID
         if ctx.getChild(2).getText() != '':
@@ -53,11 +53,11 @@ class miVisitor(compiladoresVisitor):
                     self.visitLista_var(ctx.getChild(3))
 
     def visitDefinicion(self, ctx: compiladoresParser.DefinicionContext):
-        print("visitDefinicion".center(50, '*'))
+        #print("visitDefinicion".center(50, '*'))
         return self.visitOpal(ctx.getChild(1))
 
     def visitAsignacion(self, ctx: compiladoresParser.AsignacionContext):
-        print("visitAsignacion".center(50, '*'))
+        #print("visitAsignacion".center(50, '*'))
 
         # esto sirve para verificar si se trata de un llamado a funcion
         if ctx.getChild(2).getChild(0).getChild(0).getChild(0).getChild(0).getChild(0).getChild(0).getChildCount() == 4:
@@ -71,7 +71,7 @@ class miVisitor(compiladoresVisitor):
                     '\n' + ctx.getChild(0).getText() + ' = ' + self.tmp.tActual())
 
     def visitLista_var(self, ctx: compiladoresParser.Lista_varContext):
-        print("visitLista_var".center(50, '*'))
+        #print("visitLista_var".center(50, '*'))
 
         # si la variable tiene definicion, escribir el codigo intermedio
         if ctx.getChild(2).getText() != '':
@@ -85,7 +85,7 @@ class miVisitor(compiladoresVisitor):
             self.visitLista_var(ctx.getChild(3))
 
     def visitIf_stmt(self, ctx: compiladoresParser.If_stmtContext):
-        print("visitIf_stmt".center(50, '*'))
+        #print("visitIf_stmt".center(50, '*'))
         aux = self.visitOpal(ctx.getChild(2))
         with ManejoArchivo("output/visitor/codigo_intermedio.txt") as archivoCI:
             archivoCI.write(
@@ -101,13 +101,13 @@ class miVisitor(compiladoresVisitor):
             archivoCI.write(f'\nlabel {self.tmp.lActual()}')
 
     def visitElse_stmt(self, ctx: compiladoresParser.Else_stmtContext):
-        print("visitElse_stmt".center(50, '*'))
+        #print("visitElse_stmt".center(50, '*'))
         with ManejoArchivo("output/visitor/codigo_intermedio.txt") as archivoCI:
             archivoCI.write(f'\nlabel {self.tmp.lAnterior()}')
         return self.visitBloque(ctx.getChild(1))
 
     def visitFor_stmt(self, ctx: compiladoresParser.For_stmtContext):
-        print("visitFor_stmt".center(50, '*'))
+        #print("visitFor_stmt".center(50, '*'))
         # se resuelve la asignacion de la variable de iteracion del bucle
         self.visitAsignacion(ctx.getChild(2))
 
@@ -133,7 +133,7 @@ class miVisitor(compiladoresVisitor):
             archivoCI.write(f'\nlabel {self.tmp.lActual()}')
 
     def visitWhile_stmt(self, ctx: compiladoresParser.While_stmtContext):
-        print("visitWhile_stmt".center(50, '*'))
+        #print("visitWhile_stmt".center(50, '*'))
         # se escribe la etiqueta para mantenerse en bucle
         with ManejoArchivo("output/visitor/codigo_intermedio.txt") as archivoCI:
             archivoCI.write(f'\nlabel {self.tmp.l()}')
@@ -154,11 +154,11 @@ class miVisitor(compiladoresVisitor):
             archivoCI.write(f'\nlabel {self.tmp.lActual()}')
 
     def visitRetornar(self, ctx: compiladoresParser.RetornarContext):
-        print("visitRetornar".center(50, '*'))
+        #print("visitRetornar".center(50, '*'))
         return self.visitChildren(ctx)
 
     def visitLlamada_funcion(self, ctx: compiladoresParser.Llamada_funcionContext):
-        print("visitLlamada_funcion".center(50, '*'))
+        #print("visitLlamada_funcion".center(50, '*'))
         listaEtiquetas = self.tmp.lFuncion(ctx.getChild(0).getText())
         self.visitArgs_enviado(ctx.getChild(2))
 
@@ -168,7 +168,7 @@ class miVisitor(compiladoresVisitor):
             archivoCI.write(f'\nlabel {str(listaEtiquetas[0])}')
 
     def visitArgs_enviado(self, ctx: compiladoresParser.Args_enviadoContext):
-        print("visitArgs_enviado".center(50, '*'))
+        #print("visitArgs_enviado".center(50, '*'))
         with ManejoArchivo("output/visitor/codigo_intermedio.txt") as archivoCI:
             archivoCI.write(f'\npush {ctx.getChild(0).getText()}')
 
@@ -179,7 +179,7 @@ class miVisitor(compiladoresVisitor):
         return 1
 
     def visitLista_args_enviado(self, ctx: compiladoresParser.Lista_args_enviadoContext):
-        print("visitLista_args_enviado".center(50, '*'))
+        #print("visitLista_args_enviado".center(50, '*'))
         with ManejoArchivo("output/visitor/codigo_intermedio.txt") as archivoCI:
             archivoCI.write(f'\npush {ctx.getChild(1).getText()}')
         # verifico si hay mas parametros en el argumento
@@ -189,7 +189,7 @@ class miVisitor(compiladoresVisitor):
         return 1
 
     def visitFuncion(self, ctx: compiladoresParser.FuncionContext):
-        print("visitFuncion".center(50, '*'))
+        #print("visitFuncion".center(50, '*'))
         self.funcion = True
 
         if ctx.getChild(1).getText() == 'main':
@@ -224,7 +224,7 @@ class miVisitor(compiladoresVisitor):
         pass
 
     def visitArgs_recibido(self, ctx: compiladoresParser.Args_recibidoContext):
-        print("visitArgs_recibido".center(50, '*'))
+        #print("visitArgs_recibido".center(50, '*'))
         with ManejoArchivo("output/visitor/codigo_intermedio.txt") as archivoCI:
             archivoCI.write(f'\npop {ctx.getChild(1).getText()}')
 
@@ -235,7 +235,7 @@ class miVisitor(compiladoresVisitor):
         return 1
 
     def visitLista_args_recibido(self, ctx: compiladoresParser.Lista_args_recibidoContext):
-        print("visitLista_args_recibido".center(50, '*'))
+        #print("visitLista_args_recibido".center(50, '*'))
         with ManejoArchivo("output/visitor/codigo_intermedio.txt") as archivoCI:
             archivoCI.write(f'\npop {ctx.getChild(2).getText()}')
         # verifico si hay mas parametros en el argumento
@@ -245,11 +245,11 @@ class miVisitor(compiladoresVisitor):
         return 1
 
     def visitOpal(self, ctx: compiladoresParser.OpalContext):
-        print("visitOpal".center(50, '*'))
+        #print("visitOpal".center(50, '*'))
         return self.visitExpresionl(ctx.getChild(0))
 
     def visitExpresionl(self, ctx: compiladoresParser.ExpresionlContext):
-        print("visitExpresionl".center(50, '*'))
+        # print("visitExpresionl".center(50, '*'))
 
         # para llamada a funcion
         if ctx.getChild(0).getChild(0).getChild(0).getChild(0).getChild(0).getChildCount() == 4:
@@ -264,7 +264,7 @@ class miVisitor(compiladoresVisitor):
         return self.tmp.tActual()
 
     def visitExpl(self, ctx: compiladoresParser.ExplContext):
-        print("visitExpl".center(50, '*'))
+        #print("visitExpl".center(50, '*'))
 
         aux1 = self.visitTerminol(ctx.getChild(1))
         # caso base recursividad
@@ -281,7 +281,7 @@ class miVisitor(compiladoresVisitor):
         return self.tmp.tActual()
 
     def visitTerminol(self, ctx: compiladoresParser.TerminolContext):
-        print("visitTerminol".center(50, '*'))
+        #print("visitTerminol".center(50, '*'))
 
         # para llamada funcion
         if ctx.getChild(0).getChild(0).getChild(0).getChild(0).getChildCount() == 4:
@@ -312,11 +312,11 @@ class miVisitor(compiladoresVisitor):
         return self.visitExpresion(ctx.getChild(0))
 
     def visitTerml(self, ctx: compiladoresParser.TermlContext):
-        print("visitTerml".center(50, '*'))
+        #print("visitTerml".center(50, '*'))
         return self.visitExpresionl(ctx.getChild(1))
 
     def visitFactor(self, ctx: compiladoresParser.FactorContext):
-        print("visitFactor".center(50, '*'))
+        #print("visitFactor".center(50, '*'))
 
         # # si la cantidad de hijos del hijo del hijo del
         # # factor es 4, entonces es una llamada a funcion
@@ -329,7 +329,7 @@ class miVisitor(compiladoresVisitor):
             return self.visitChild(0).getText()
 
     def visitExpresion(self, ctx: compiladoresParser.ExpresionContext):
-        print("visitExpresion".center(50, '*'))
+        #print("visitExpresion".center(50, '*'))
 
         # para llamada a funcion
         if ctx.getChild(0).getChild(0).getChild(0).getChildCount() == 4:
@@ -345,7 +345,7 @@ class miVisitor(compiladoresVisitor):
 
     # Visit a parse tree produced by compiladoresParser#exp.
     def visitExp(self, ctx: compiladoresParser.ExpContext):
-        print("visitExp".center(50, '*'))
+        #print("visitExp".center(50, '*'))
         aux1 = self.visitTermino(ctx.getChild(1))
         # caso base recursividad
         # si el hijo 3 no contiene nada, finaliza la recursividad
@@ -360,7 +360,7 @@ class miVisitor(compiladoresVisitor):
         return self.tmp.tActual()
 
     def visitTermino(self, ctx: compiladoresParser.TerminoContext):
-        print("visitTermino".center(50, '*'))
+        #print("visitTermino".center(50, '*'))
 
         # se fija si es una  llamda a funcion al tener 4 hijos
         if ctx.getChild(0).getChild(0).getChildCount() == 4:
@@ -383,7 +383,7 @@ class miVisitor(compiladoresVisitor):
         return self.tmp.tActual()
 
     def visitTerm(self, ctx: compiladoresParser.TermContext):
-        print("visitTerm".center(50, '*'))
+        #print("visitTerm".center(50, '*'))
 
         # corrobora si el factor es una expresion encerrada entre parentesis
         if ctx.getChild(1).getChild(0).getText() == '(':

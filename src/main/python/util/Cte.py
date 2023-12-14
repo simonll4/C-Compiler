@@ -28,3 +28,4 @@ class Cte:
     nombreF = re.compile(r'label\s+((?!main|\bl\d+)\S+)')
     funcion = re.compile(r'\blabel\b\w*')
     opalLetas = re.compile(r'\bt\d+[=][a-zA-Z]+\s*([+\-*/][a-zA-Z]+\s*)*\b')
+    variableNumero = re.compile(r"^[a-zA-Z]=\d+$")

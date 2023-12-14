@@ -77,6 +77,7 @@ class miListener(compiladoresListener):
         # el orden de las listas es el mismo para las dos
 
         listaId = Util.obtenerIdVariables(ctx.getText()[len(tDato):])
+
         listaInicializados = Util.verificarInicializado(
             ctx.getText()[len(tDato):])
 
